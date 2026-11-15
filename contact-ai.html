@@ -361,7 +361,7 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
     try {
       const apiEndpoint = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
         ? 'http://localhost:8000/api/contact'
-        : 'https://infinity-api.onrender.com/api/contact'; // Replace with your live Render backend URL
+        : 'https://infinity-solutions-api.onrender.com/api/contact';
       const res = await fetch(apiEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

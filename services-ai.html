@@ -970,7 +970,7 @@ async function submitApply() {
   try {
     const apiEndpoint = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
       ? 'http://localhost:8000/api/contact'
-      : 'https://infinity-api.onrender.com/api/contact';
+      : 'https://infinity-solutions-api.onrender.com/api/contact';
     const res = await fetch(apiEndpoint, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
     // backend not required — show success regardless for static demo
   } catch {}

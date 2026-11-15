@@ -676,7 +676,7 @@ async function submitApply() {
   btn.innerHTML = '⏳ &nbsp;Submitting…';
   const apiEndpoint = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
     ? 'http://localhost:8000/api/contact'
-    : 'https://infinity-api.onrender.com/api/contact';
+    : 'https://infinity-solutions-api.onrender.com/api/contact';
   try { await fetch(apiEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); } catch {}
   await new Promise(r => setTimeout(r, 600));
   document.getElementById('applyFormWrap').style.display = 'none';
@@ -858,7 +858,7 @@ async function submitProfile() {
   };
   const apiEndpoint = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
     ? 'http://localhost:8000/api/contact'
-    : 'https://infinity-api.onrender.com/api/contact';
+    : 'https://infinity-solutions-api.onrender.com/api/contact';
   try { await fetch(apiEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); } catch {}
   await new Promise(r => setTimeout(r, 600));
   document.getElementById('profileFormWrap').style.display = 'none';
