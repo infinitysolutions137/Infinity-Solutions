@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+  <!-- Security headers -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
+  <meta http-equiv="X-Frame-Options" content="DENY"/>
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin"/>
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Infinity Solutions — AI-Powered Talent Platform</title>
+<meta name="description" content="Canada's AI-powered staffing platform — matching top tech, finance, and business talent with leading companies using intelligent candidate scoring."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/style.css"/>
+<link rel="stylesheet" href="css/chatbot.css"/>
+<style>
+/* ── HOME-SPECIFIC ─────────────────────────────────────────────────────── */
+
+/* Hero */
+.hero {
+  margin-top: var(--nav-h);
+  min-height: calc(100vh - var(--nav-h));
+  display: flex; align-items: center;
+  background: var(--gray-900);
+  position: relative; overflow: hidden;
+  padding: 80px 0;
+}
+.hero-photo-bg {
+  position: absolute; inset: 0; z-index: 0;
+}
+.hero-photo-bg img {
+  width: 100%; height: 100%; object-fit: cover; object-position: center 25%;
+  opacity: .22;
+}
+.hero-bg-grid {
+  position: absolute; inset: 0; z-index: 1;
+  background-image:
+    linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+  background-size: 52px 52px;
+  mask-image: radial-gradient(ellipse 70% 80% at 40% 50%, black 20%, transparent 100%);
+}
+.hero-overlay-grad {
+  position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(90deg, rgba(15,23,42,.95) 35%, rgba(15,23,42,.55) 70%, rgba(15,23,42,.2) 100%);
+}
+.hero-content { position: relative; z-index: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; width: 100%; }
+.hero-left {}
+.hero-right { display: flex; justify-content: center; }
+
+.hero-announce {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2); backdrop-filter:blur(10px);
+  border-radius: 100px; padding: 7px 16px 7px 8px;
+  margin-bottom: 28px; box-shadow: var(--shadow-sm);
+}
+.ha-pill {
+  background: var(--primary); color: #fff;
+  border-radius: 100px; padding: 3px 10px;
+  font-size: .68rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+}
+.ha-text { font-size: .82rem; font-weight: 500; color: var(--gray-700); }
+
+.hero h1 { font-size: clamp(2.8rem, 5vw, 4.2rem); font-weight: 800; letter-spacing: -.035em; line-height: 1.05; color: #fff; margin-bottom: 22px; }
+.hero h1 .serif { font-family: var(--font-serif); font-style: italic; font-weight: 400; color: var(--primary); }
+.hero-sub { font-size: 1.05rem; color: rgba(255,255,255,.75); max-width: 460px; line-height: 1.8; margin-bottom: 36px; }
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 48px; }
+
+.hero-trust { display: flex; align-items: center; gap: 14px; }
+.trust-avatars { display: flex; }
+.trust-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 2px solid #fff; margin-left: -8px; overflow: hidden;
+  background: var(--blue-100); display: flex; align-items: center; justify-content: center;
+  font-size: .7rem; font-weight: 700; color: var(--primary);
+}
+.trust-avatar:first-child { margin-left: 0; }
+.trust-text { font-size: .82rem; color: rgba(255,255,255,.75); }
+.trust-text strong { color: #fff; }
+
+/* AI Dashboard mockup */
+.ai-dashboard {
+  background: #fff; border: 1px solid var(--border);
+  border-radius: var(--radius-xl); box-shadow: var(--shadow-lg);
+  overflow: hidden; width: 100%; max-width: 440px;
+  animation: float 5s ease-in-out infinite;
+}
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+.ai-dash-header {
+  background: var(--gray-900); padding: 14px 20px;
+  display: flex; align-items: center; gap: 10px;
+}
+.ai-dash-dots { display: flex; gap: 6px; }
+.ai-dash-dot { width: 10px; height: 10px; border-radius: 50%; }
+.ai-dash-title { font-size: .78rem; font-weight: 600; color: rgba(255,255,255,.6); margin: 0 auto; }
+.ai-dash-body { padding: 20px; }
+.ai-dash-label { font-size: .68rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--text-light); margin-bottom: 12px; }
+
+.ai-scanning {
+  background: var(--gray-50); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 16px; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 12px;
+}
+.ai-scan-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+.ai-scan-text strong { display: block; font-size: .88rem; font-weight: 700; color: var(--gray-900); }
+.ai-scan-text span { font-size: .75rem; color: var(--text-mid); }
+.ai-scan-bar { height: 4px; background: var(--gray-200); border-radius: 100px; margin-top: 8px; overflow: hidden; }
+.ai-scan-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg, var(--blue-500), var(--primary)); animation: scanFill 2.5s ease-in-out infinite alternate; }
+@keyframes scanFill { from{width:20%} to{width:95%} }
+
+.ai-match-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+.ai-match-item {
+  display: flex; align-items: center; gap: 10px;
+  background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px;
+}
+.ai-match-av {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--blue-100); display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: .75rem; color: var(--primary); flex-shrink: 0;
+}
+.ai-match-info { flex: 1; }
+.ai-match-name { font-size: .84rem; font-weight: 700; color: var(--gray-900); }
+.ai-match-role { font-size: .72rem; color: var(--text-mid); }
+.ai-match-score {
+  font-size: .72rem; font-weight: 800; color: var(--primary);
+  background: var(--blue-50); border: 1px solid var(--blue-200);
+  border-radius: 100px; padding: 3px 9px;
+}
+
+.ai-insight {
+  background: linear-gradient(135deg, #EFF6FF, #DBEAFE);
+  border: 1px solid var(--blue-200); border-radius: 10px;
+  padding: 12px 14px; display: flex; align-items: center; gap: 10px;
+}
+.ai-insight-icon { font-size: 1.2rem; }
+.ai-insight-text { font-size: .78rem; color: var(--blue-700); line-height: 1.5; }
+.ai-insight-text strong { display: block; font-weight: 700; color: var(--blue-900); margin-bottom: 2px; }
+
+/* Stats */
+.stats-section { background: #fff; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 48px 0; }
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
+.stat-item { text-align: center; padding: 16px; border-right: 1px solid var(--border); }
+.stat-item:last-child { border-right: none; }
+.stat-num { font-size: 2.6rem; font-weight: 800; letter-spacing: -.03em; color: var(--gray-900); line-height: 1; }
+.stat-label { font-size: .82rem; color: var(--text-mid); margin-top: 8px; }
+
+/* Search hero */
+.hero-search { background: #fff; border: 1.5px solid var(--gray-200); border-radius: 14px; box-shadow: var(--shadow-md); overflow: hidden; }
+.hs-tabs { display: flex; border-bottom: 1px solid var(--border); }
+.hs-tab { flex: 1; padding: 12px; font-size: .82rem; font-weight: 600; color: var(--text-mid); cursor: pointer; border: none; background: none; font-family: var(--font-sans); transition: all .2s; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.hs-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+.hs-body { padding: 16px; }
+.hs-row { display: flex; gap: 10px; align-items: stretch; }
+.hs-input-wrap { flex: 1; position: relative; }
+.hs-input-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--gray-400); pointer-events: none; }
+.hs-input {
+  width: 100%; border: 1.5px solid var(--border); border-radius: 9px;
+  padding: 12px 12px 12px 36px; font-family: var(--font-sans); font-size: .88rem;
+  color: var(--gray-900); outline: none; transition: border-color .2s;
+}
+.hs-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,.08); }
+.hs-input::placeholder { color: var(--gray-400); }
+.hs-select { border: 1.5px solid var(--border); border-radius: 9px; padding: 12px 14px; font-family: var(--font-sans); font-size: .88rem; color: var(--gray-700); outline: none; cursor: pointer; min-width: 160px; background: #fff; }
+.hs-select:focus { border-color: var(--primary); }
+.hs-submit { background: var(--primary); color: #fff; border: none; border-radius: 9px; padding: 12px 24px; font-weight: 700; font-size: .88rem; cursor: pointer; font-family: var(--font-sans); transition: background .2s; white-space: nowrap; }
+.hs-submit:hover { background: var(--primary-h); }
+
+/* AI Features */
+.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 56px; }
+.feature-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 32px; transition: all .25s; }
+.feature-card:hover { border-color: var(--blue-200); box-shadow: var(--shadow-lg); transform: translateY(-4px); }
+.feature-icon-wrap { width: 54px; height: 54px; border-radius: 14px; background: var(--blue-50); border: 1px solid var(--blue-200); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 18px; }
+.feature-card h3 { font-size: 1rem; font-weight: 700; color: var(--gray-900); margin-bottom: 8px; }
+.feature-card p { color: var(--gray-600); font-size: .875rem; line-height: 1.7; }
+.feature-card .ai-tag { margin-top: 16px; }
+
+/* Two-path split with images */
+.split-section { display: grid; grid-template-columns: 1fr 1fr; }
+.split-card { position: relative; min-height: 500px; display: flex; align-items: flex-end; overflow: hidden; }
+.split-img { position: absolute; inset: 0; }
+.split-img img { width: 100%; height: 100%; object-fit: cover; }
+.split-overlay { position: absolute; inset: 0; }
+.split-content { position: relative; z-index: 2; padding: 40px; }
+.split-eyebrow { display: inline-block; background: rgba(255,255,255,.15); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,.25); color: #fff; font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 4px 12px; border-radius: 100px; margin-bottom: 14px; }
+.split-content h2 { font-size: 1.8rem; font-weight: 800; color: #fff; line-height: 1.2; margin-bottom: 12px; letter-spacing: -.02em; }
+.split-content p { color: rgba(255,255,255,.8); font-size: .9rem; margin-bottom: 22px; max-width: 340px; line-height: 1.7; }
+
+/* Sectors */
+.sectors-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 48px; }
+.sector-card { background: #fff; border: 1.5px solid var(--border); border-radius: var(--radius-lg); padding: 24px; text-align: center; transition: all .25s; cursor: pointer; }
+.sector-card:hover { border-color: var(--primary); box-shadow: 0 8px 24px rgba(37,99,235,.1); transform: translateY(-3px); }
+.sector-emoji { font-size: 2rem; margin-bottom: 12px; display: block; }
+.sector-name { font-size: .9rem; font-weight: 700; color: var(--gray-900); margin-bottom: 4px; }
+.sector-count { font-size: .78rem; color: var(--text-mid); }
+
+/* Testimonials */
+.tcard { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 32px; transition: all .25s; }
+.tcard:hover { box-shadow: var(--shadow-lg); transform: translateY(-4px); }
+.tcard-stars { color: #FBBF24; font-size: .9rem; margin-bottom: 14px; }
+.tcard p { color: var(--gray-700); font-size: .92rem; line-height: 1.75; margin-bottom: 22px; font-style: italic; }
+.tcard-author { display: flex; align-items: center; gap: 12px; }
+.tcard-av { width: 44px; height: 44px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: var(--blue-100); display: flex; align-items: center; justify-content: center; font-weight: 800; color: var(--primary); font-size: .8rem; }
+.tcard-av img { width: 100%; height: 100%; object-fit: cover; }
+.tcard-name { font-weight: 700; font-size: .9rem; color: var(--gray-900); }
+.tcard-role { font-size: .78rem; color: var(--text-mid); }
+
+/* CTA */
+.cta-section { background: var(--gray-900); position: relative; overflow: hidden; padding: 96px 0; text-align: center; }
+.cta-bg { position: absolute; inset: 0; background: url('https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=1400&q=60&auto=format&fit=crop') center/cover no-repeat; opacity: .06; }
+.cta-glow1 { position: absolute; width: 500px; height: 500px; border-radius: 50%; background: rgba(37,99,235,.15); filter: blur(100px); top: -100px; left: -100px; }
+.cta-glow2 { position: absolute; width: 400px; height: 400px; border-radius: 50%; background: rgba(37,99,235,.1); filter: blur(80px); bottom: -80px; right: -80px; }
+.cta-content { position: relative; z-index: 2; max-width: 680px; margin: 0 auto; }
+.cta-content h2 { font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 800; color: #fff; margin-bottom: 16px; letter-spacing: -.025em; }
+.cta-content p { color: rgba(255,255,255,.65); font-size: 1.05rem; margin-bottom: 36px; }
+.cta-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+/* Hot job badge */
+.jc-hot-badge {
+  position: absolute; top: 20px; right: 20px;
+  background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+  border: 1px solid #F59E0B; color: #92400E;
+  border-radius: 100px; padding: 3px 10px; font-size: .7rem; font-weight: 700;
+}
+
+@media (max-width: 1024px) {
+  .hero-content { grid-template-columns: 1fr; }
+  .hero-right { display: none; }
+  .features-grid { grid-template-columns: 1fr 1fr; }
+  .sectors-grid { grid-template-columns: 1fr 1fr; }
+  .split-section { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
+  .stat-item:nth-child(2n) { border-right: none; }
+}
+@media (max-width: 768px) {
+  .features-grid, .sectors-grid { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 2.4rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAVBAR ═══════════════════════════════════════════════════════════ -->
+<nav class="navbar" id="navbar">
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-mark">IS</div>
+    Infinity Solutions
+  </a>
+  <div class="nav-center">
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="jobs.html">Jobs</a></li>
+      <li><a href="services-ai.html">Services</a></li>
+      <li><a href="about-ai.html">About</a></li>
+      <li><a href="contact-ai.html">Contact</a></li>
+    </ul>
+  </div>
+  <div class="nav-right">
+    <div class="nav-ai-badge"><span class="nav-ai-dot"></span> AI-Powered</div>
+    <a href="contact-ai.html" class="btn btn-primary btn-sm">Hire Talent →</a>
+    <button class="burger" id="burger" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<div class="mobile-drawer" id="drawer">
+  <a href="index.html">Home</a><a href="jobs.html">Jobs</a>
+  <a href="services-ai.html">Services</a><a href="jobs.html">Careers</a><a href="about-ai.html">About</a>
+  <a href="contact-ai.html">Contact</a>
+</div>
+
+<!-- ═══ HERO ═════════════════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-photo-bg"><img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1600&q=70&auto=format&fit=crop" alt=""/></div>
+  <div class="hero-overlay-grad"></div>
+  <div class="hero-bg-grid"></div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-left" data-animate data-delay="0">
+        <div class="hero-announce">
+          <span class="ha-pill">New</span>
+          <span class="ha-text" style="color:rgba(255,255,255,.85)">AI Match Score now live on all listings</span>
+        </div>
+        <h1>
+          Find talent —<br/>
+          <span class="serif">smarter</span> &amp; faster<br/>
+          with AI
+        </h1>
+        <p class="hero-sub">
+          Canada's first AI-powered staffing platform. We score, rank, and match professionals across IT, Finance, and Business — delivering shortlists in hours, not weeks.
+        </p>
+        <div class="hero-actions">
+          <a href="jobs.html" class="btn btn-primary btn-lg">Search Jobs →</a>
+          <a href="contact-ai.html" class="btn btn-ghost btn-lg">Hire with AI</a>
+        </div>
+        <div class="hero-trust">
+          <div class="trust-avatars">
+            <div class="trust-avatar">AK</div>
+            <div class="trust-avatar">SR</div>
+            <div class="trust-avatar">JL</div>
+            <div class="trust-avatar">MP</div>
+          </div>
+          <span class="trust-text"><strong>500+</strong> professionals placed this year</span>
+        </div>
+      </div>
+
+      <div class="hero-right" data-animate data-delay="150">
+        <div class="ai-dashboard">
+          <div class="ai-dash-header">
+            <div class="ai-dash-dots">
+              <div class="ai-dash-dot" style="background:#FF5F57"></div>
+              <div class="ai-dash-dot" style="background:#FFBD2E"></div>
+              <div class="ai-dash-dot" style="background:#28C840"></div>
+            </div>
+            <div class="ai-dash-title">✦ AI Talent Intelligence</div>
+          </div>
+          <div class="ai-dash-body">
+            <div class="ai-dash-label">Live Candidate Matching</div>
+            <div class="ai-scanning">
+              <div class="ai-scan-icon">🤖</div>
+              <div class="ai-scan-text">
+                <strong>Scanning 3,200 candidates...</strong>
+                <span>Analysing skills, culture fit &amp; salary expectations</span>
+                <div class="ai-scan-bar"><div class="ai-scan-fill"></div></div>
+              </div>
+            </div>
+            <div class="ai-dash-label">Top Matches — Senior AI Engineer</div>
+            <div class="ai-match-list">
+              <div class="ai-match-item">
+                <div class="ai-match-av">AK</div>
+                <div class="ai-match-info">
+                  <div class="ai-match-name">Amir Khan</div>
+                  <div class="ai-match-role">ML Engineer · 8 yrs · Toronto</div>
+                </div>
+                <div class="ai-match-score">98%</div>
+              </div>
+              <div class="ai-match-item">
+                <div class="ai-match-av">SR</div>
+                <div class="ai-match-info">
+                  <div class="ai-match-name">Sofia Reyes</div>
+                  <div class="ai-match-role">AI Researcher · 6 yrs · Vancouver</div>
+                </div>
+                <div class="ai-match-score">95%</div>
+              </div>
+              <div class="ai-match-item">
+                <div class="ai-match-av">JL</div>
+                <div class="ai-match-info">
+                  <div class="ai-match-name">James Liu</div>
+                  <div class="ai-match-role">Data Scientist · 7 yrs · Montreal</div>
+                </div>
+                <div class="ai-match-score">91%</div>
+              </div>
+            </div>
+            <div class="ai-insight">
+              <div class="ai-insight-icon">💡</div>
+              <div class="ai-insight-text">
+                <strong>AI Insight</strong>
+                Top candidates available within 5 business days. Shortlist ready in 2h.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ STATS ═════════════════════════════════════════════════════════════ -->
+<div class="stats-section">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item"><div class="stat-num" data-count="500" data-suffix="+">500+</div><div class="stat-label">Placements made</div></div>
+      <div class="stat-item"><div class="stat-num" data-count="98" data-suffix="%">98%</div><div class="stat-label">Client satisfaction</div></div>
+      <div class="stat-item"><div class="stat-num" data-count="24" data-suffix="h">24h</div><div class="stat-label">AI shortlist turnaround</div></div>
+      <div class="stat-item"><div class="stat-num" data-count="3200" data-suffix="+">3,200+</div><div class="stat-label">Active candidates scored</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SEARCH BAR ════════════════════════════════════════════════════════ -->
+<div style="background:var(--gray-50);border-bottom:1px solid var(--border);padding:28px 0;">
+  <div class="container">
+    <div class="hero-search" style="max-width:860px;margin:0 auto">
+      <div class="hs-tabs">
+        <button class="hs-tab active stab" data-tab="jobs">Find Jobs</button>
+        <button class="hs-tab stab" data-tab="talent">Hire Talent</button>
+      </div>
+      <div class="hs-body">
+        <form class="hs-row" action="jobs.html" method="get">
+          <div class="hs-input-wrap">
+            <svg class="hs-input-icon" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input class="hs-input" name="search" placeholder="Role, skill, or keyword..."/>
+          </div>
+          <select class="hs-select" name="sector">
+            <option value="">All Industries</option>
+            <option>Artificial Intelligence</option>
+            <option>Technology</option>
+            <option>Data &amp; Analytics</option>
+            <option>Finance &amp; Accounting</option>
+          </select>
+          <button class="hs-submit" type="submit">🔍 Search</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TWO-PATH ══════════════════════════════════════════════════════════ -->
+<div class="split-section">
+  <div class="split-card">
+    <div class="split-img">
+      <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&q=80&auto=format&fit=crop" alt="AI job seeker"/>
+    </div>
+    <div class="split-overlay" style="background:linear-gradient(0deg,rgba(15,23,42,.85) 0%,rgba(15,23,42,.2) 60%)"></div>
+    <div class="split-content">
+      <span class="split-eyebrow">For Job Seekers</span>
+      <h2>Get matched by AI,<br/>not luck</h2>
+      <p>Upload your profile once. Our AI ranks you against live roles and surfaces opportunities that match your skills, salary, and ambitions.</p>
+      <a href="jobs.html" class="btn btn-white">Browse AI-Matched Jobs →</a>
+    </div>
+  </div>
+  <div class="split-card">
+    <div class="split-img">
+      <img src="https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?w=800&q=80&auto=format&fit=crop" alt="AI talent platform for employers"/>
+    </div>
+    <div class="split-overlay" style="background:linear-gradient(0deg,rgba(29,78,216,.85) 0%,rgba(29,78,216,.2) 60%)"></div>
+    <div class="split-content">
+      <span class="split-eyebrow">For Employers</span>
+      <h2>AI shortlists in<br/>under 24 hours</h2>
+      <p>Tell us the role — our AI scans 3,200+ vetted candidates, scores each against your requirements, and delivers a ranked shortlist fast.</p>
+      <a href="contact-ai.html" class="btn btn-white">Start AI Hiring →</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ AI FEATURES ════════════════════════════════════════════════════════ -->
+<section class="section" style="background:var(--gray-50)">
+  <div class="container">
+    <div class="eyebrow">AI-Powered Platform</div>
+    <h2 class="display-md">How our AI makes<br/>hiring smarter</h2>
+    <div class="features-grid">
+      <div class="feature-card" data-animate data-delay="0">
+        <div class="feature-icon-wrap">🧠</div>
+        <h3>Intelligent Candidate Scoring</h3>
+        <p>Every candidate is scored across 40+ parameters — skills, experience depth, culture signals, salary alignment, and availability — producing a precise match percentage.</p>
+        <span class="ai-tag">AI Match Score</span>
+      </div>
+      <div class="feature-card" data-animate data-delay="100">
+        <div class="feature-icon-wrap">⚡</div>
+        <h3>24-Hour Shortlists</h3>
+        <p>While traditional agencies take weeks, our AI surfaces a ranked shortlist of verified candidates within 24 hours of receiving your role brief.</p>
+        <span class="ai-tag">Real-Time Processing</span>
+      </div>
+      <div class="feature-card" data-animate data-delay="200">
+        <div class="feature-icon-wrap">🎯</div>
+        <h3>Predictive Fit Analysis</h3>
+        <p>Beyond the resume — our model analyses communication patterns, career trajectory, and role longevity signals to predict long-term fit before the first interview.</p>
+        <span class="ai-tag">Predictive Analytics</span>
+      </div>
+      <div class="feature-card" data-animate data-delay="0">
+        <div class="feature-icon-wrap">🔍</div>
+        <h3>Bias-Reduced Screening</h3>
+        <p>Our AI evaluates candidates anonymously on merit, reducing unconscious bias and surfacing diverse talent that traditional screening misses.</p>
+        <span class="ai-tag">Inclusive AI</span>
+      </div>
+      <div class="feature-card" data-animate data-delay="100">
+        <div class="feature-icon-wrap">📈</div>
+        <h3>Live Market Intelligence</h3>
+        <p>Real-time salary benchmarking, role demand forecasting, and skills gap analysis give you and candidates the data to make confident decisions.</p>
+        <span class="ai-tag">Market Data</span>
+      </div>
+      <div class="feature-card" data-animate data-delay="200">
+        <div class="feature-icon-wrap">🤝</div>
+        <h3>Human + AI Verification</h3>
+        <p>Every AI recommendation is reviewed by a specialist recruiter — combining machine speed with human judgment for zero-compromise quality.</p>
+        <span class="ai-tag">Human-in-the-Loop</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTORS ════════════════════════════════════════════════════════════ -->
+<section class="section">
+  <div class="container">
+    <div class="eyebrow">Industries We Serve</div>
+    <h2 class="display-md">Specialized talent for<br/>high-demand sectors</h2>
+    <div class="sectors-grid" style="grid-template-columns:repeat(3,1fr)">
+      <a href="jobs.html?sector=Artificial+Intelligence" class="sector-card">
+        <span class="sector-emoji">🤖</span>
+        <div class="sector-name">Artificial Intelligence</div>
+        <div class="sector-count">3 open roles</div>
+      </a>
+      <a href="jobs.html?sector=Technology" class="sector-card">
+        <span class="sector-emoji">💻</span>
+        <div class="sector-name">IT &amp; Technology</div>
+        <div class="sector-count">5 open roles</div>
+      </a>
+      <a href="jobs.html?sector=Data+%26+Analytics" class="sector-card">
+        <span class="sector-emoji">📊</span>
+        <div class="sector-name">Data &amp; Analytics</div>
+        <div class="sector-count">2 open roles</div>
+      </a>
+      <a href="jobs.html?sector=Engineering" class="sector-card">
+        <span class="sector-emoji">⚙️</span>
+        <div class="sector-name">Engineering</div>
+        <div class="sector-count">4 open roles</div>
+      </a>
+      <a href="jobs.html?sector=Legal+%26+Compliance" class="sector-card">
+        <span class="sector-emoji">⚖️</span>
+        <div class="sector-name">Legal &amp; Compliance</div>
+        <div class="sector-count">4 open roles</div>
+      </a>
+      <a href="jobs.html?sector=Finance+%26+Accounting" class="sector-card">
+        <span class="sector-emoji">💰</span>
+        <div class="sector-name">Finance &amp; Accounting</div>
+        <div class="sector-count">2 open roles</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ TESTIMONIALS ══════════════════════════════════════════════════════ -->
+<section class="section" style="background:var(--gray-50)">
+  <div class="container">
+    <div class="eyebrow">Client Stories</div>
+    <h2 class="display-md">Results that speak<br/>for themselves</h2>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px">
+      <div class="tcard" data-animate>
+        <div class="tcard-stars">★★★★★</div>
+        <p>"The AI match score was spot-on. All three engineers placed were still with us a year later — cultural fit was exceptional. Infinity's platform is unlike anything we've used."</p>
+        <div class="tcard-author">
+          <div class="tcard-av">DC</div>
+          <div><div class="tcard-name">David Chen</div><div class="tcard-role">CTO, TechCorp Canada</div></div>
+        </div>
+      </div>
+      <div class="tcard" data-animate data-delay="100">
+        <div class="tcard-stars">★★★★★</div>
+        <p>"We got a ranked shortlist of 5 data scientists within 18 hours of briefing. The AI insight report they sent alongside was genuinely useful — saved us 3 weeks of screening."</p>
+        <div class="tcard-author">
+          <div class="tcard-av">MP</div>
+          <div><div class="tcard-name">Mia Patel</div><div class="tcard-role">Head of Data, AnalyticsX</div></div>
+        </div>
+      </div>
+      <div class="tcard" data-animate data-delay="200">
+        <div class="tcard-stars">★★★★★</div>
+        <p>"I was placed in a senior ML role in 11 days. The AI matched me to roles I wouldn't have found myself — salary was 18% higher than my previous position. Game changer."</p>
+        <div class="tcard-author">
+          <div class="tcard-av">SR</div>
+          <div><div class="tcard-name">Sofia Reyes</div><div class="tcard-role">ML Engineer, Synaptic Labs</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ═══════════════════════════════════════════════════════════════ -->
+<section class="cta-section">
+  <div class="cta-bg"></div>
+  <div class="cta-glow1"></div>
+  <div class="cta-glow2"></div>
+  <div class="container">
+    <div class="cta-content">
+      <div style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:12px">✦ &nbsp; AI-First Staffing</div>
+      <h2>Ready to hire smarter,<br/>or land your next role?</h2>
+      <p>Join 120+ companies and 500+ professionals already using Infinity's AI platform to make better career moves.</p>
+      <div class="cta-actions">
+        <a href="contact-ai.html" class="btn btn-primary btn-lg">Start Hiring with AI →</a>
+        <a href="jobs.html" class="btn btn-ghost btn-lg" style="color:#fff;border-color:rgba(255,255,255,.25)">Browse AI-Matched Jobs</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ════════════════════════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="nav-logo" style="color:#fff">
+          <div class="nav-logo-mark">IS</div>
+          Infinity Solutions
+        </div>
+        <p class="footer-brand" style="color:var(--gray-400);font-size:.875rem;line-height:1.8;margin-top:16px;max-width:280px">
+          Canada's AI-powered staffing platform — connecting top talent with leading companies through intelligent matching.
+        </p>
+        <div class="footer-contact">
+          <a href="contact-ai.html">✉️ Contact Us</a>
+          <span>📍 Toronto, Ontario, Canada 🇨🇦</span>
+          <a href="contact-ai.html">💬 Chat with Aria (AI Assistant)</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h5>Job Seekers</h5>
+        <a href="jobs.html">Browse Jobs</a>
+        <a href="jobs.html?remote=true">Remote Jobs</a>
+        <a href="contact-ai.html">Upload Profile</a>
+        <a href="jobs.html">AI Job Match</a>
+      </div>
+      <div class="footer-col">
+        <h5>Employers</h5>
+        <a href="contact-ai.html">Hire with AI</a>
+        <a href="services-ai.html">Contract Talent</a>
+        <a href="services-ai.html">Permanent Hire</a>
+        <a href="services-ai.html">Managed Solutions</a>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <a href="about-ai.html">About Us</a>
+        <a href="services-ai.html">Our Services</a>
+        <a href="contact-ai.html">Contact</a>
+        <a href="#">Privacy Policy</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Infinity Solutions Inc. All rights reserved.</p>
+      <div style="display:flex;gap:20px">
+        <a href="#">Privacy</a><a href="#">Terms</a><a href="#">Accessibility</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js" type="module"></script>
+<script>
+// Fallback inline init for non-module browsers
+document.addEventListener('DOMContentLoaded', () => {
+  // Navbar
+  const nav = document.getElementById('navbar');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 20), {passive:true});
+  // Burger
+  const burger = document.getElementById('burger'), drawer = document.getElementById('drawer');
+  burger.addEventListener('click', () => drawer.classList.toggle('open'));
+  drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => drawer.classList.remove('open')));
+  // Tabs
+  document.querySelectorAll('.stab').forEach(t => t.addEventListener('click', () => {
+    document.querySelectorAll('.stab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+  }));
+  // Counter
+  const counters = document.querySelectorAll('[data-count]');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const el = e.target, target = parseInt(el.dataset.count), suffix = el.dataset.suffix || '';
+      const start = performance.now();
+      const tick = (now) => {
+        const p = Math.min((now - start) / 1800, 1);
+        const ease = 1 - Math.pow(1 - p, 3);
+        const val = Math.floor(ease * target);
+        el.textContent = (val >= 1000 ? val.toLocaleString() : val) + suffix;
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+      obs.unobserve(el);
+    });
+  }, { threshold: .5 });
+  counters.forEach(c => obs.observe(c));
+});
+</script>
+<script src="js/chatbot.js"></script>
+</body>
+</html>

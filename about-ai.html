@@ -1,0 +1,142 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/>
+  <!-- Security headers -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
+  <meta http-equiv="X-Frame-Options" content="DENY"/>
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin"/>
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>About — Infinity Solutions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/style.css"/>
+<link rel="stylesheet" href="css/chatbot.css"/>
+<style>
+.about-hero{margin-top:var(--nav-h);display:grid;grid-template-columns:1fr 1fr;min-height:540px}
+.ah-left{background:var(--gray-900);padding:80px 64px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
+.ah-left::before{content:'';position:absolute;top:-80px;right:-80px;width:300px;height:300px;border-radius:50%;background:rgba(37,99,235,.15);filter:blur(60px)}
+.ah-left .eyebrow{color:rgba(255,255,255,.5)}.ah-left .eyebrow::before{background:rgba(255,255,255,.3)}
+.ah-left h1{color:#fff;font-size:clamp(2rem,3.5vw,3rem);font-weight:800;letter-spacing:-.025em;margin-bottom:16px}
+.ah-left p{color:rgba(255,255,255,.65);line-height:1.8;margin-bottom:28px}
+.ah-right{position:relative;overflow:hidden}
+.ah-right img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.mission-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;padding:80px 0}
+.check-list{margin-top:20px;display:flex;flex-direction:column;gap:12px}
+.cli{display:flex;align-items:flex-start;gap:12px;font-size:.92rem;color:var(--gray-700)}
+.cli::before{content:'✓';color:var(--primary);font-weight:800;flex-shrink:0;margin-top:2px}
+.stats-2x2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.sc{background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:28px 22px;text-align:center;transition:all .25s}
+.sc:hover{border-color:var(--primary);transform:translateY(-3px);box-shadow:0 8px 24px rgba(37,99,235,.1)}
+.sc-num{font-size:2.4rem;font-weight:800;letter-spacing:-.03em;color:var(--gray-900)}
+.sc-title{font-weight:700;font-size:.9rem;color:var(--gray-700);margin:4px 0}
+.sc-sub{font-size:.78rem;color:var(--text-mid)}
+.dark-band{background:var(--gray-900);padding:80px 0}
+.dark-band .eyebrow{color:rgba(255,255,255,.5)}.dark-band .eyebrow::before{background:rgba(255,255,255,.3)}
+.ai-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:48px}
+.ai-step{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:28px;text-align:center;transition:all .25s}
+.ai-step:hover{background:rgba(255,255,255,.09);border-color:rgba(37,99,235,.4)}
+.ai-step-icon{font-size:2rem;margin-bottom:14px}
+.ai-step h3{font-size:.95rem;font-weight:700;color:#fff;margin-bottom:8px}
+.ai-step p{color:rgba(255,255,255,.55);font-size:.82rem;line-height:1.65}
+.values-section{padding:80px 0;background:var(--gray-50)}
+.vgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:48px}
+.vc{background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:26px 20px;text-align:center;transition:all .25s}
+.vc:hover{border-color:var(--primary);transform:translateY(-3px)}
+.vi{font-size:2rem;margin-bottom:12px}
+.vc h3{font-size:.95rem;font-weight:700;margin-bottom:6px}
+.vc p{color:var(--text-mid);font-size:.82rem;line-height:1.65}
+.cta-band{background:var(--primary);padding:80px 0;text-align:center}
+.cta-band h2{font-size:2.4rem;font-weight:800;color:#fff;margin-bottom:12px;letter-spacing:-.02em}
+.cta-band p{color:rgba(255,255,255,.75);margin-bottom:28px}
+.cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+@media(max-width:900px){.nav-center{display:none}.burger{display:flex!important}.about-hero,.mission-grid{grid-template-columns:1fr}.ah-right{min-height:280px;position:relative}.ah-right img{position:absolute;inset:0}.ai-steps,.vgrid{grid-template-columns:1fr 1fr}.stats-2x2{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.ai-steps,.vgrid,.stats-2x2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav class="navbar" id="navbar">
+  <a href="index.html" class="nav-logo"><div class="nav-logo-mark">IS</div> Infinity Solutions</a>
+  <div class="nav-center"><ul class="nav-links"><li><a href="index.html">Home</a></li><li><a href="jobs.html">Jobs</a></li><li><a href="services-ai.html">Services</a></li><li><a href="about-ai.html" class="active">About</a></li><li><a href="contact-ai.html">Contact</a></li></ul></div>
+  <div class="nav-right"><div class="nav-ai-badge"><span class="nav-ai-dot"></span> AI-Powered</div><a href="contact-ai.html" class="btn btn-primary btn-sm">Hire Talent →</a><button class="burger" id="burger" style="display:none"><span></span><span></span><span></span></button></div>
+</nav>
+<div class="mobile-drawer" id="drawer"><a href="index.html">Home</a><a href="jobs.html">Jobs</a><a href="services-ai.html">Services</a><a href="about-ai.html">About</a><a href="contact-ai.html">Contact</a></div>
+
+<div class="about-hero">
+  <div class="ah-left">
+    <div class="eyebrow">Our Story</div>
+    <h1>Built for the<br/><em style="font-family:'Instrument Serif',serif;font-style:italic;font-weight:400;color:#93C5FD">AI era</em> of hiring</h1>
+    <p>Founded in Toronto, Infinity Solutions was built with a single conviction: the hiring industry was broken, and AI could fix it. We're the first Canadian staffing platform to put AI match scoring at the center of every placement.</p>
+    <a href="contact-ai.html" class="btn btn-primary">Work With Us →</a>
+  </div>
+  <div class="ah-right"><img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=900&q=80&auto=format&fit=crop" alt="Infinity team using AI platform"/></div>
+</div>
+
+<div class="container">
+  <div class="mission-grid">
+    <div>
+      <div class="eyebrow">Our Mission</div>
+      <h2 class="display-md">Where human expertise<br/>meets machine precision</h2>
+      <p style="color:var(--gray-600);line-height:1.8;margin-top:14px;margin-bottom:14px">We believe the right match changes careers and companies. Our team combines deep industry knowledge with proprietary AI to deliver talent that's not just qualified — but genuinely aligned.</p>
+      <p style="color:var(--gray-600);line-height:1.8;margin-bottom:22px">From tech startups to Bay Street finance firms — we've built a reputation for speed, precision, and zero-compromise quality.</p>
+      <div class="check-list">
+        <div class="cli">Canada's first AI-scored talent platform</div>
+        <div class="cli">40+ matching parameters per candidate</div>
+        <div class="cli">Human recruiter review on every AI shortlist</div>
+        <div class="cli">90-day placement guarantee on permanent hires</div>
+      </div>
+    </div>
+    <div class="stats-2x2">
+      <div class="sc"><div class="sc-num" data-count="500" data-suffix="+">500+</div><div class="sc-title">Placements Made</div><div class="sc-sub">Across 4 industries</div></div>
+      <div class="sc"><div class="sc-num" data-count="98" data-suffix="%">98%</div><div class="sc-title">Client Satisfaction</div><div class="sc-sub">Survey-verified</div></div>
+      <div class="sc"><div class="sc-num" data-count="120" data-suffix="+">120+</div><div class="sc-title">Partner Companies</div><div class="sc-sub">Canada-wide</div></div>
+      <div class="sc"><div class="sc-num">24h</div><div class="sc-title">AI Shortlist Delivery</div><div class="sc-sub">From role brief to candidates</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="dark-band">
+  <div class="container">
+    <div class="eyebrow">How Our AI Works</div>
+    <h2 class="display-md" style="color:#fff">Intelligence at every step</h2>
+    <div class="ai-steps">
+      <div class="ai-step"><div class="ai-step-icon">📥</div><h3>Ingest &amp; Parse</h3><p>AI reads resumes, LinkedIn profiles, and portfolio data — extracting 40+ structured signals instantly.</p></div>
+      <div class="ai-step"><div class="ai-step-icon">🧮</div><h3>Score &amp; Rank</h3><p>Each candidate is scored against the role's requirements, culture signals, and compensation benchmarks.</p></div>
+      <div class="ai-step"><div class="ai-step-icon">👤</div><h3>Human Review</h3><p>A specialist recruiter reviews the AI shortlist, adds contextual insight, and removes edge cases.</p></div>
+      <div class="ai-step"><div class="ai-step-icon">📤</div><h3>Deliver &amp; Iterate</h3><p>You receive a ranked shortlist with AI insight reports. Feedback loops improve scores in real time.</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="values-section">
+  <div class="container">
+    <div class="eyebrow">Our Values</div>
+    <h2 class="display-md">What drives us every day</h2>
+    <div class="vgrid">
+      <div class="vc"><div class="vi">🎯</div><h3>Precision</h3><p>Every recommendation is signal-driven — not volume-driven. We'd rather send 3 great candidates than 30 average ones.</p></div>
+      <div class="vc"><div class="vi">⚡</div><h3>Speed</h3><p>AI lets us move faster without cutting corners. Shortlists in 24h, first interviews scheduled same week.</p></div>
+      <div class="vc"><div class="vi">🤝</div><h3>Integrity</h3><p>We only recommend candidates we'd hire ourselves. No padding, no filler, no wasted time.</p></div>
+      <div class="vc"><div class="vi">🌎</div><h3>Inclusivity</h3><p>Anonymous AI screening reduces bias at source — surfacing diverse talent traditional processes overlook.</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="cta-band">
+  <div class="container" style="max-width:640px;margin:0 auto">
+    <div style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:12px">✦ AI-First Staffing</div>
+    <h2>Ready to hire or be hired?</h2>
+    <p>Join 120+ companies using Infinity's AI platform to make smarter talent decisions.</p>
+    <div class="cta-row"><a href="contact-ai.html" class="btn btn-white">Contact Us →</a><a href="jobs.html" class="btn" style="background:rgba(255,255,255,.15);color:#fff;border:2px solid rgba(255,255,255,.3)">Browse Jobs</a></div>
+  </div>
+</div>
+
+<footer class="footer"><div class="container"><div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,.08);padding-top:24px;flex-wrap:wrap;gap:12px"><div class="nav-logo" style="color:#fff"><div class="nav-logo-mark">IS</div> Infinity Solutions</div><p style="color:var(--gray-500);font-size:.8rem">© 2025 Infinity Solutions Inc.</p><div style="display:flex;gap:20px"><a href="index.html" style="color:var(--gray-500);font-size:.8rem">Home</a><a href="contact-ai.html" style="color:var(--gray-500);font-size:.8rem">Contact</a></div></div></div></footer>
+<script>
+const nav=document.getElementById('navbar');
+window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>20),{passive:true});
+const b=document.getElementById('burger'),d=document.getElementById('drawer');
+if(b){b.style.display='';b.addEventListener('click',()=>d.classList.toggle('open'));}
+// Counter
+const counters=document.querySelectorAll('[data-count]');
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(!e.isIntersecting)return;const el=e.target,target=parseInt(el.dataset.count),suffix=el.dataset.suffix||'';const start=performance.now();const tick=(now)=>{const p=Math.min((now-start)/1800,1);const ease=1-Math.pow(1-p,3);const val=Math.floor(ease*target);el.textContent=(val>=1000?val.toLocaleString():val)+suffix;if(p<1)requestAnimationFrame(tick);};requestAnimationFrame(tick);obs.unobserve(el);});},{threshold:.5});
+counters.forEach(c=>obs.observe(c));
+</script>
+<script src="js/chatbot.js"></script>
+</body></html>

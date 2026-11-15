@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+  <!-- Security headers -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
+  <meta http-equiv="X-Frame-Options" content="DENY"/>
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin"/>
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Jobs — Infinity Solutions</title>
+<meta name="description" content="Browse all open jobs at Infinity Solutions — live Ceipal postings plus AI-matched featured roles across IT, Engineering, Legal, Finance and more."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/style.css"/>
+<link rel="stylesheet" href="css/chatbot.css"/>
+<style>
+
+/* ── PAGE HEADER ────────────────────────────────────────────────── */
+.page-header {
+  margin-top: var(--nav-h);
+  background: var(--gray-900);
+  padding: 72px 0 64px;
+  position: relative; overflow: hidden;
+}
+.ph-bg { position:absolute;inset:0; }
+.ph-bg img { width:100%;height:100%;object-fit:cover;object-position:center 30%;opacity:.12; }
+.ph-grad { position:absolute;inset:0;background:linear-gradient(135deg,rgba(15,23,42,.97) 40%,rgba(29,78,216,.3) 100%); }
+.ph-inner { position:relative;z-index:2; }
+.ph-inner .eyebrow { color:rgba(255,255,255,.5); }
+.ph-inner .eyebrow::before { background:rgba(255,255,255,.3); }
+.ph-inner h1 { color:#fff;letter-spacing:-.03em; }
+.ph-inner p { color:rgba(255,255,255,.62);margin-top:14px;max-width:560px;line-height:1.8;font-size:1rem; }
+.ph-badges { display:flex;gap:12px;flex-wrap:wrap;margin-top:28px; }
+.ph-badge {
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+  color:rgba(255,255,255,.8);border-radius:100px;
+  padding:7px 16px;font-size:.82rem;font-weight:600;
+}
+.ph-badge span { color:#34D399; }
+
+/* ── SECTION DIVIDER ─────────────────────────────────────────────── */
+.section-divider {
+  display:flex;align-items:center;gap:20px;
+  padding:56px 0 48px;
+}
+.section-divider::before,.section-divider::after {
+  content:'';flex:1;height:1px;background:var(--border);
+}
+.section-divider-label {
+  display:flex;align-items:center;gap:10px;white-space:nowrap;
+  font-size:.75rem;font-weight:700;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--text-mid);
+}
+
+/* ── CEIPAL EMBED ZONE ──────────────────────────────────────────── */
+.ceipal-zone { max-width:1200px;margin:0 auto;padding:0 5%; }
+
+/* ── PLACEHOLDER (shown before Ceipal is connected) ────────────── */
+.ceipal-placeholder {
+  border:2px dashed var(--border);border-radius:20px;
+  padding:56px 40px;text-align:center;
+  background:var(--gray-50);
+}
+.cp-icon { font-size:3.5rem;margin-bottom:20px; }
+.cp-title { font-size:1.4rem;font-weight:800;color:var(--gray-900);margin-bottom:10px; }
+.cp-sub { color:var(--text-mid);max-width:520px;margin:0 auto 32px;line-height:1.75;font-size:.95rem; }
+.steps-row {
+  display:grid;grid-template-columns:repeat(3,1fr);gap:20px;
+  text-align:left;margin:0 auto 36px;max-width:780px;
+}
+.step-box {
+  background:#fff;border:1.5px solid var(--border);border-radius:14px;
+  padding:22px 20px;
+}
+.step-num {
+  width:32px;height:32px;border-radius:8px;
+  background:var(--blue-50);border:1px solid var(--blue-200);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.8rem;font-weight:800;color:var(--primary);margin-bottom:12px;
+}
+.step-box h4 { font-size:.92rem;font-weight:700;color:var(--gray-900);margin-bottom:6px; }
+.step-box p { font-size:.82rem;color:var(--text-mid);line-height:1.65; }
+.code-snippet {
+  display:inline-block;background:var(--gray-900);color:#34D399;
+  border-radius:8px;padding:10px 18px;font-family:'Courier New',monospace;
+  font-size:.82rem;margin:12px 0;letter-spacing:.02em;
+  text-align:left;max-width:100%;overflow-x:auto;
+  border:1px solid rgba(255,255,255,.1);
+}
+
+/* ── CEIPAL LIVE EMBED ──────────────────────────────────────────── */
+/*
+   HOW TO CONNECT CEIPAL:
+   1. Log in to your Ceipal account
+   2. Go to Settings → Career Portal → Embed Code
+   3. Copy the iframe or script tag Ceipal provides
+   4. Delete the .ceipal-placeholder div below
+   5. Paste your Ceipal code inside .ceipal-live-embed
+   6. Save and refresh — done!
+*/
+.ceipal-live-embed {
+  width:100%;
+  /* Ceipal iframes often need min-height — adjust if content is cut off */
+  min-height:700px;
+}
+.ceipal-live-embed iframe {
+  width:100%;
+  min-height:700px;
+  border:none;
+  border-radius:12px;
+}
+
+/* ── OUR OWN JOBS VIEW ──────────────────────────────────────────── */
+.own-jobs-zone { max-width:1200px;margin:0 auto;padding:0 5%; }
+.filter-bar {
+  display:flex;gap:10px;flex-wrap:wrap;
+  align-items:center;margin-bottom:28px;
+}
+.search-wrap { flex:1;min-width:220px;position:relative; }
+.search-icon { position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--gray-400);pointer-events:none; }
+.search-input {
+  width:100%;border:1.5px solid var(--border);border-radius:10px;
+  padding:11px 14px 11px 38px;font-family:var(--font-sans);font-size:.875rem;
+  color:var(--gray-900);outline:none;transition:border-color .2s;background:#fff;
+}
+.search-input:focus { border-color:var(--primary);box-shadow:0 0 0 4px rgba(37,99,235,.07); }
+.search-input::placeholder { color:var(--gray-400); }
+.filter-select {
+  border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;
+  font-family:var(--font-sans);font-size:.875rem;color:var(--gray-700);
+  outline:none;cursor:pointer;background:#fff;transition:border-color .2s;
+}
+.filter-select:focus { border-color:var(--primary); }
+.results-bar {
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:18px;flex-wrap:wrap;gap:8px;
+}
+.results-text { font-size:.85rem;color:var(--text-mid); }
+.results-text strong { color:var(--gray-900); }
+.sort-sel {
+  border:1px solid var(--border);border-radius:8px;
+  padding:6px 12px;font-family:var(--font-sans);font-size:.82rem;
+  color:var(--gray-700);outline:none;cursor:pointer;background:#fff;
+}
+#jobs-list { display:flex;flex-direction:column;gap:16px; }
+
+/* ── AI BANNER ──────────────────────────────────────────────────── */
+.ai-banner {
+  background:linear-gradient(135deg,#1E3A8A,#2563EB);
+  border-radius:16px;padding:22px 28px;
+  display:flex;align-items:center;gap:18px;
+  margin-bottom:24px;position:relative;overflow:hidden;
+}
+.ai-banner::before { content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.07); }
+.ab-icon { font-size:1.8rem;flex-shrink:0; }
+.ab-text h4 { font-size:.95rem;font-weight:700;color:#fff;margin-bottom:3px; }
+.ab-text p { font-size:.82rem;color:rgba(255,255,255,.72); }
+.ab-btn { margin-left:auto;flex-shrink:0; }
+
+/* ── JOB CARD (reused from jobs-ai) ────────────────────────────── */
+.job-card {
+  background:#fff;border:1.5px solid var(--gray-200);
+  border-radius:20px;padding:26px 28px;
+  transition:all .25s;position:relative;overflow:hidden;
+}
+.job-card::before {
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--blue-500),var(--blue-700));
+  transform:scaleX(0);transform-origin:left;transition:transform .3s;
+}
+.job-card:hover { border-color:var(--blue-300);box-shadow:0 8px 32px rgba(37,99,235,.12);transform:translateY(-3px); }
+.job-card:hover::before { transform:scaleX(1); }
+.jc-header { display:flex;align-items:flex-start;gap:14px;margin-bottom:12px; }
+.jc-logo { width:50px;height:50px;border-radius:12px;background:var(--gray-100);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0; }
+.jc-meta-top { flex:1; }
+.jc-title { font-size:1.02rem;font-weight:700;color:var(--gray-900);margin-bottom:3px; }
+.jc-company { font-size:.83rem;color:var(--text-mid); }
+.jc-match { background:linear-gradient(135deg,#EFF6FF,#DBEAFE);border:1px solid var(--blue-200);border-radius:8px;padding:6px 10px;text-align:center;flex-shrink:0; }
+.jc-match-pct { font-size:1rem;font-weight:800;color:var(--primary);display:block;line-height:1; }
+.jc-match-label { font-size:.6rem;color:var(--blue-700);font-weight:600;letter-spacing:.04em; }
+.jc-desc { color:var(--gray-600);font-size:.875rem;line-height:1.65;margin-bottom:12px; }
+.jc-tags { display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px; }
+.jc-tag { background:var(--gray-100);color:var(--gray-700);border-radius:6px;padding:4px 10px;font-size:.78rem;font-weight:500; }
+.sector-badge { display:inline-flex;align-items:center;border-radius:100px;padding:4px 12px;font-size:.72rem;font-weight:700;border:1.5px solid; }
+.jc-info { display:flex;flex-wrap:wrap;gap:14px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--gray-100); }
+.jc-info-item { display:flex;align-items:center;gap:5px;font-size:.82rem;color:var(--text-mid); }
+.jc-remote { color:var(--primary);font-weight:600; }
+.jc-footer { display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap; }
+.jc-posted { font-size:.78rem;color:var(--text-light); }
+.jc-actions { display:flex;align-items:center;gap:8px; }
+.share-popover { position:relative; }
+.share-btn { width:36px;height:36px;border-radius:8px;background:var(--gray-100);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;color:var(--gray-500); }
+.share-btn:hover { background:var(--blue-50);color:var(--primary);border-color:var(--blue-200); }
+.share-menu { display:none;position:absolute;bottom:calc(100% + 8px);right:0;background:#fff;border:1px solid var(--border);border-radius:12px;padding:8px;box-shadow:0 12px 40px rgba(0,0,0,.12);z-index:50;min-width:180px; }
+.share-menu.open { display:block;animation:popIn .15s ease; }
+@keyframes popIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+.share-menu-title { font-size:.7rem;font-weight:700;color:var(--text-light);letter-spacing:.06em;text-transform:uppercase;padding:4px 8px 8px; }
+.share-link { display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;font-size:.85rem;font-weight:500;cursor:pointer;transition:background .15s;border:none;background:none;width:100%;text-align:left;text-decoration:none;color:var(--gray-700); }
+.share-link:hover { background:var(--gray-100);color:var(--gray-900); }
+.share-icon { width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0; }
+.share-whatsapp { background:#dcfce7; }
+.share-linkedin { background:#dbeafe; }
+.share-facebook { background:#ede9fe; }
+.share-copy { background:var(--gray-100); }
+.jc-hot-badge { position:absolute;top:18px;right:18px;background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:1px solid #F59E0B;color:#92400E;border-radius:100px;padding:3px 10px;font-size:.7rem;font-weight:700; }
+
+/* ── APPLY MODAL ────────────────────────────────────────────────── */
+.apply-backdrop {
+  position:fixed;inset:0;background:rgba(0,0,0,.45);
+  z-index:2000;display:none;align-items:center;justify-content:center;padding:20px;
+}
+.apply-backdrop.open { display:flex; }
+.apply-box {
+  background:#fff;border-radius:20px;padding:36px 32px;
+  width:100%;max-width:480px;
+  box-shadow:0 24px 80px rgba(0,0,0,.2);
+  position:relative;max-height:90vh;overflow-y:auto;
+}
+.ab-close { position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:8px;background:var(--gray-100);border:none;cursor:pointer;font-size:1.1rem;color:var(--gray-500);display:flex;align-items:center;justify-content:center; }
+.ab-close:hover { background:var(--gray-200); }
+.ab-title { font-size:1.1rem;font-weight:800;color:var(--gray-900);margin-bottom:4px; }
+.ab-job { font-size:.88rem;color:var(--primary);font-weight:600;margin-bottom:20px; }
+.ab-label { font-size:.74rem;font-weight:600;color:var(--gray-600);margin-bottom:5px;display:block; }
+.ab-fi { width:100%;border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;font-family:var(--font-sans);font-size:.875rem;color:var(--gray-900);outline:none;transition:border-color .2s;margin-bottom:12px; }
+.ab-fi:focus { border-color:var(--primary);box-shadow:0 0 0 4px rgba(37,99,235,.07); }
+.ab-fi::placeholder { color:var(--gray-400); }
+.ab-err { background:#FEF2F2;border:1px solid #FCA5A5;color:#B91C1C;padding:9px 13px;border-radius:8px;font-size:.82rem;margin-bottom:12px;display:none; }
+.ab-submit { width:100%;background:var(--primary);color:#fff;border:none;border-radius:10px;padding:13px;font-family:var(--font-sans);font-size:.95rem;font-weight:700;cursor:pointer;transition:background .2s; }
+.ab-submit:hover { background:var(--primary-h); }
+.ab-submit:disabled { background:#9CA3AF;cursor:not-allowed; }
+.resume-upload-zone {
+  border:2px dashed var(--border);border-radius:10px;
+  padding:18px 16px;text-align:center;cursor:pointer;
+  transition:all .2s;margin-bottom:12px;position:relative;
+  background:var(--gray-50);
+}
+.resume-upload-zone:hover,.resume-upload-zone.dragover {
+  border-color:var(--primary);background:var(--blue-50);
+}
+.resume-upload-zone input[type=file] {
+  position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;
+}
+.ruz-icon { font-size:1.6rem;margin-bottom:6px; }
+.ruz-text { font-size:.85rem;font-weight:600;color:var(--gray-700); }
+.ruz-sub { font-size:.75rem;color:var(--text-mid);margin-top:3px; }
+.ruz-chosen {
+  display:none;align-items:center;gap:10px;
+  background:#fff;border:1.5px solid var(--blue-200);
+  border-radius:10px;padding:10px 14px;margin-bottom:12px;
+}
+.ruz-chosen.show { display:flex; }
+.ruz-file-icon { font-size:1.4rem;flex-shrink:0; }
+.ruz-file-name { font-size:.83rem;font-weight:600;color:var(--gray-900);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.ruz-file-size { font-size:.75rem;color:var(--text-mid);flex-shrink:0; }
+.ruz-remove { background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:1rem;padding:0;flex-shrink:0; }
+.ruz-remove:hover { color:#EF4444; }
+.ab-success { text-align:center;padding:24px 0; }
+.ab-success .big { font-size:3.5rem;display:block;margin-bottom:12px; }
+.ab-success h3 { font-size:1.2rem;font-weight:800;color:var(--gray-900);margin-bottom:6px; }
+.ab-success p { font-size:.875rem;color:var(--text-mid); }
+.captcha-row {
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:14px;min-height:65px;
+  background:var(--gray-50);border-radius:10px;border:1.5px solid var(--border);
+  overflow:hidden;
+}
+.captcha-note {
+  font-size:.7rem;color:var(--text-light);text-align:center;
+  margin:-8px 0 12px;
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────────────────── */
+@media(max-width:900px) {
+  .nav-center { display:none; }
+  .burger { display:flex !important; }
+  .steps-row { grid-template-columns:1fr; }
+  .filter-bar { flex-direction:column;align-items:stretch; }
+}
+@media(max-width:600px) {
+  .ph-badges { gap:8px; }
+
+}
+</style>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+</head>
+<body>
+
+<!-- ══ NAVBAR ═══════════════════════════════════════════════════════ -->
+<nav class="navbar" id="navbar">
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-mark">IS</div>
+    Infinity Solutions
+  </a>
+  <div class="nav-center">
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="jobs.html" class="active">Jobs</a></li>
+      <li><a href="services-ai.html">Services</a></li>
+      <li><a href="about-ai.html">About</a></li>
+      <li><a href="contact-ai.html">Contact</a></li>
+    </ul>
+  </div>
+  <div class="nav-right">
+    <div class="nav-ai-badge"><span class="nav-ai-dot"></span> AI-Powered</div>
+    <a href="contact-ai.html" class="btn btn-primary btn-sm">Hire Talent →</a>
+    <button class="burger" id="burger" style="display:none"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mobile-drawer" id="drawer">
+  <a href="index.html">Home</a><a href="jobs.html">Jobs</a>
+  <a href="services-ai.html">Services</a><a href="jobs.html">Careers</a>
+  <a href="about-ai.html">About</a><a href="contact-ai.html">Contact</a>
+</div>
+
+<!-- ══ PAGE HEADER ═══════════════════════════════════════════════════ -->
+<div class="page-header">
+  <div class="ph-bg">
+    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=1400&q=60&auto=format&fit=crop" alt=""/>
+  </div>
+  <div class="ph-grad"></div>
+  <div class="container ph-inner">
+    <div class="eyebrow">Career Opportunities</div>
+    <h1 class="display-lg">Find your next great role</h1>
+    <p>Browse all active positions across IT, Engineering, Legal, Finance, AI and more — AI-matched to your profile, updated daily from our live pipeline.</p>
+    <div class="ph-badges">
+      <div class="ph-badge"><span>✦</span> AI Match Score on every role</div>
+      <div class="ph-badge"><span>⚡</span> Updated daily</div>
+      <div class="ph-badge"><span>🇨🇦</span> Canada-wide</div>
+      <div class="ph-badge"><span>🌐</span> Remote &amp; hybrid roles included</div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ══ VIEW: CEIPAL LIVE ══════════════════════════════════════════════ -->
+<div class="container" style="padding-top:56px" id="ceipal-section">
+  <div class="eyebrow" style="margin-bottom:14px">Live Jobs — Ceipal Integration</div>
+  <h2 class="display-md" style="margin-bottom:8px">Positions from our ATS</h2>
+  <p style="color:var(--text-mid);margin-bottom:32px;max-width:560px;line-height:1.75">Once Ceipal is connected, every job posted in your ATS appears here automatically — updated in real time.</p>
+
+    <!-- ════════════════════════════════════════════════════════════════
+         CEIPAL EMBED SECTION
+         ────────────────────────────────────────────────────────────────
+         TO CONNECT CEIPAL:
+           1. Log in to Ceipal ATS → Settings → Career Portal
+           2. Click "Embed on your website" / "Get embed code"
+           3. Copy the <iframe> or <script> tag they give you
+           4. DELETE the ceipal-placeholder div below
+           5. PASTE your Ceipal code inside ceipal-live-embed
+           6. Save careers.html and refresh — done!
+
+         Ceipal embed code looks like one of these:
+           <iframe src="https://app.ceipal.com/jobboard/your-company-id/..." ...></iframe>
+           <script src="https://app.ceipal.com/embed/..." ...></script>
+
+         RESIZE: If Ceipal content is cut off, increase min-height
+         in the .ceipal-live-embed CSS rule (currently 700px).
+         ════════════════════════════════════════════════════════════════ -->
+
+    <!-- PLACEHOLDER — delete this div once Ceipal is connected -->
+    <div class="ceipal-placeholder">
+      <div class="cp-icon">🔗</div>
+      <div class="cp-title">Ceipal Job Board — Not Yet Connected</div>
+      <div class="cp-sub">
+        Once connected, all your live Ceipal job postings will appear here automatically —
+        updated in real time every time you add or close a role in Ceipal ATS.
+        <br/><br/>
+        Follow the 3 steps below to connect:
+      </div>
+      <div class="steps-row">
+        <div class="step-box">
+          <div class="step-num">1</div>
+          <h4>Get your embed code from Ceipal</h4>
+          <p>Log in to Ceipal ATS → Settings → Career Portal → "Embed on your website". Copy the iframe or script tag.</p>
+        </div>
+        <div class="step-box">
+          <div class="step-num">2</div>
+          <h4>Paste it into careers.html</h4>
+          <p>Open <code style="background:var(--gray-100);padding:2px 6px;border-radius:4px;font-size:.8rem">jobs.html</code> in VS Code. Find the comment that says <strong>"YOUR CEIPAL IFRAME OR SCRIPT GOES HERE"</strong> and paste your code there.</p>
+        </div>
+        <div class="step-box">
+          <div class="step-num">3</div>
+          <h4>Delete this placeholder &amp; save</h4>
+          <p>Delete the <code style="background:var(--gray-100);padding:2px 6px;border-radius:4px;font-size:.8rem">.ceipal-placeholder</code> div. Save careers.html. Refresh — your live jobs appear instantly.</p>
+        </div>
+      </div>
+      <div style="background:var(--gray-900);border-radius:12px;padding:20px 28px;max-width:680px;margin:0 auto;text-align:left">
+        <div style="font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:12px">What Ceipal's embed code looks like</div>
+        <div class="code-snippet" style="display:block;background:transparent;color:#34D399;font-size:.82rem;white-space:pre-wrap">&lt;!-- Option A — iframe --&gt;
+&lt;iframe
+  src="https://app.ceipal.com/jobboard/YOURCOMPANYID/jobs"
+  width="100%"
+  height="700"
+  frameborder="0"
+  allowfullscreen&gt;
+&lt;/iframe&gt;
+
+&lt;!-- Option B — script embed --&gt;
+&lt;div id="ceipal-job-board"&gt;&lt;/div&gt;
+&lt;script src="https://app.ceipal.com/embed/YOURCOMPANYID.js"&gt;&lt;/script&gt;</div>
+      </div>
+      <div style="margin-top:28px">
+        <a href="https://www.ceipal.com" target="_blank" rel="noopener" class="btn btn-primary btn-lg">Open Ceipal ATS →</a>
+        <a href="contact-ai.html" class="btn btn-ghost btn-lg" style="margin-left:12px">Contact us instead</a>
+      </div>
+    </div>
+    <!-- END PLACEHOLDER -->
+
+    <!-- PASTE YOUR CEIPAL CODE INSIDE THIS DIV -->
+    <div class="ceipal-live-embed" id="ceipalEmbed">
+      <!-- YOUR CEIPAL IFRAME OR SCRIPT GOES HERE -->
+    </div>
+    <!-- END CEIPAL EMBED -->
+
+</div>
+
+<!-- ══ OUR OWN JOBS ════════════════════════════════════════════ -->
+<div class="section-divider"><div class="section-divider-label">✦ Featured Roles — Curated by our team</div></div>
+<div class="container" id="own-section">
+
+    <!-- AI banner -->
+    <div class="ai-banner">
+      <div class="ab-icon">✦</div>
+      <div class="ab-text">
+        <h4>AI Match Score active</h4>
+        <p>Every role shows your estimated fit % — scored across 40+ parameters including skills, salary alignment, and location</p>
+      </div>
+      <button class="btn btn-white btn-sm ab-btn" onclick="openProfileUpload()">Upload Profile →</button>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <div class="search-wrap">
+        <svg class="search-icon" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input class="search-input" id="job-search" placeholder="Role, skill, company, or keyword…"/>
+      </div>
+      <select class="filter-select" id="sector-filter" data-filter="sector">
+        <option value="">All Sectors</option>
+        <option value="Artificial Intelligence">Artificial Intelligence</option>
+        <option value="Technology">IT &amp; Technology</option>
+        <option value="Data & Analytics">Data &amp; Analytics</option>
+        <option value="Engineering">Engineering</option>
+        <option value="Legal & Compliance">Legal &amp; Compliance</option>
+        <option value="Finance & Accounting">Finance &amp; Accounting</option>
+      </select>
+      <select class="filter-select" id="type-filter" data-filter="type">
+        <option value="">All Types</option>
+        <option value="Permanent">Permanent</option>
+        <option value="Contract">Contract</option>
+      </select>
+      <select class="filter-select" id="remote-filter" data-filter="remote">
+        <option value="">All Modes</option>
+        <option value="true">Remote OK</option>
+        <option value="false">On-site Only</option>
+      </select>
+    </div>
+
+    <div class="results-bar">
+      <p class="results-text"><strong id="results-count">18</strong> roles found</p>
+      <select class="sort-sel" id="sort-sel">
+        <option>Sort: Best Match</option>
+        <option>Sort: Newest</option>
+        <option>Sort: Salary ↑</option>
+      </select>
+    </div>
+
+    <div id="jobs-list"></div>
+  </div>
+
+<!-- ══ CTA ════════════════════════════════════════════════════════════ -->
+<div style="background:var(--gray-50);border-top:1px solid var(--border);padding:64px 0;text-align:center;margin-top:0">
+  <div class="container" style="max-width:600px">
+    <div style="font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--primary);margin-bottom:12px">✦ Can't find the right role?</div>
+    <h2 style="font-size:2rem;font-weight:800;color:var(--gray-900);margin-bottom:12px;letter-spacing:-.02em">Send us your profile anyway</h2>
+    <p style="color:var(--text-mid);margin-bottom:28px;line-height:1.75">We match candidates to roles before they're posted publicly. Upload your profile and our AI will flag you the moment a suitable role opens.</p>
+    <button class="btn btn-primary btn-lg" onclick="openProfileUpload()">Upload Your Profile →</button>
+  </div>
+</div>
+
+<!-- ══ FOOTER ════════════════════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="container">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,.08);padding-top:24px;flex-wrap:wrap;gap:12px">
+      <div class="nav-logo" style="color:#fff"><div class="nav-logo-mark">IS</div> Infinity Solutions</div>
+      <p style="color:var(--gray-500);font-size:.8rem">© 2025 Infinity Solutions Inc. All rights reserved.</p>
+      <div style="display:flex;gap:20px">
+        <a href="index.html" style="color:var(--gray-500);font-size:.8rem">Home</a>
+        <a href="jobs.html" style="color:var(--gray-500);font-size:.8rem">Jobs</a>
+        <a href="contact-ai.html" style="color:var(--gray-500);font-size:.8rem">Contact</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<!-- ══ PROFILE UPLOAD MODAL ══════════════════════════════════════════ -->
+<div class="apply-backdrop" id="profileBackdrop" onclick="closeProfile(event)">
+  <div class="apply-box">
+    <button class="ab-close" onclick="closeProfile(null)">✕</button>
+    <div id="profileFormWrap">
+      <div class="ab-title">Upload Your Profile</div>
+      <div style="font-size:.83rem;color:var(--text-mid);margin-bottom:20px;line-height:1.6">
+        No specific role in mind? Share your CV and our AI will match you the moment a suitable role opens.
+      </div>
+      <div class="ab-err" id="profileErr"></div>
+      <label class="ab-label">Full Name *</label>
+      <input class="ab-fi" id="pfName" placeholder="Jane Smith" autocomplete="name"/>
+      <label class="ab-label">Email Address *</label>
+      <input class="ab-fi" id="pfEmail" type="email" placeholder="jane@example.com" autocomplete="email"/>
+      <label class="ab-label">Phone (optional)</label>
+      <input class="ab-fi" id="pfPhone" placeholder="+1 647 555 0123" autocomplete="tel"/>
+      <label class="ab-label">LinkedIn / Portfolio (optional)</label>
+      <input class="ab-fi" id="pfLinkedin" placeholder="linkedin.com/in/yourname"/>
+      <label class="ab-label">Preferred sector(s)</label>
+      <select class="ab-fi" id="pfSector" style="cursor:pointer">
+        <option value="">— Select a sector —</option>
+        <option>IT &amp; Technology</option>
+        <option>Artificial Intelligence</option>
+        <option>Data &amp; Analytics</option>
+        <option>Engineering</option>
+        <option>Legal &amp; Compliance</option>
+        <option>Finance &amp; Accounting</option>
+        <option>Open to all sectors</option>
+      </select>
+      <label class="ab-label">Preferred role type</label>
+      <div style="display:flex;gap:10px;margin-bottom:12px">
+        <label style="display:flex;align-items:center;gap:7px;font-size:.85rem;cursor:pointer;font-family:var(--font-sans)">
+          <input type="radio" name="pfType" value="Permanent" checked/> Permanent
+        </label>
+        <label style="display:flex;align-items:center;gap:7px;font-size:.85rem;cursor:pointer;font-family:var(--font-sans)">
+          <input type="radio" name="pfType" value="Contract"/> Contract
+        </label>
+        <label style="display:flex;align-items:center;gap:7px;font-size:.85rem;cursor:pointer;font-family:var(--font-sans)">
+          <input type="radio" name="pfType" value="Either"/> Either
+        </label>
+      </div>
+      <label class="ab-label">Resume / CV *</label>
+      <div class="resume-upload-zone" id="pfResumeZone">
+        <input type="file" id="pfResume" accept=".pdf,.doc,.docx" onchange="handleResumeSelect(this,'pf')"/>
+        <div class="ruz-icon">📄</div>
+        <div class="ruz-text">Click to upload or drag &amp; drop</div>
+        <div class="ruz-sub">PDF, DOC, DOCX · Max 5MB</div>
+      </div>
+      <div class="ruz-chosen" id="pfResumeChosen">
+        <span class="ruz-file-icon">📎</span>
+        <span class="ruz-file-name" id="pfResumeFileName"></span>
+        <span class="ruz-file-size" id="pfResumeFileSize"></span>
+        <button class="ruz-remove" onclick="removeResume('pf')" title="Remove">✕</button>
+      </div>
+      <label class="ab-label">Brief note (optional)</label>
+      <textarea class="ab-fi" id="pfNote" placeholder="What kind of role are you looking for?" style="min-height:70px;resize:vertical"></textarea>
+      <label class="ab-label">Security check *</label>
+      <div class="captcha-row"><div id="pf-captcha"></div></div>
+      <p class="captcha-note">Protected by Cloudflare Turnstile</p>
+      <!-- Honeypot -->
+      <input type="text" id="pfHoneypot" name="website" autocomplete="off" tabindex="-1" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none"/>
+      <button class="ab-submit" id="pfSubmit" onclick="submitProfile()">✦ &nbsp;Submit Profile →</button>
+    </div>
+    <div class="ab-success" id="profileSuccess" style="display:none">
+      <span class="big">🎯</span>
+      <h3>Profile received!</h3>
+      <p>We'll review your CV and reach out as soon as a matching role opens. Keep an eye on your inbox.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ APPLY MODAL ════════════════════════════════════════════════════ -->
+<div class="apply-backdrop" id="applyBackdrop" onclick="closeApply(event)">
+  <div class="apply-box">
+    <button class="ab-close" onclick="closeApply(null)">✕</button>
+    <div id="applyFormWrap">
+      <div class="ab-title">Quick Apply</div>
+      <div class="ab-job" id="applyJobLabel"></div>
+      <div class="ab-err" id="applyErr"></div>
+      <label class="ab-label">Full Name *</label>
+      <input class="ab-fi" id="apName" placeholder="Jane Smith" autocomplete="name"/>
+      <label class="ab-label">Email Address *</label>
+      <input class="ab-fi" id="apEmail" type="email" placeholder="jane@example.com" autocomplete="email"/>
+      <label class="ab-label">Phone (optional)</label>
+      <input class="ab-fi" id="apPhone" placeholder="+1 647 555 0123" autocomplete="tel"/>
+      <label class="ab-label">LinkedIn / Portfolio (optional)</label>
+      <input class="ab-fi" id="apLinkedin" placeholder="linkedin.com/in/yourname"/>
+      <label class="ab-label">Cover note (optional)</label>
+      <textarea class="ab-fi" id="apNote" placeholder="Why are you a great fit?" style="min-height:80px;resize:vertical"></textarea>
+      <label class="ab-label">Resume / CV *</label>
+      <div class="resume-upload-zone" id="apResumeZone">
+        <input type="file" id="apResume" accept=".pdf,.doc,.docx" onchange="handleResumeSelect(this,'ap')"/>
+        <div class="ruz-icon">📄</div>
+        <div class="ruz-text">Click to upload or drag &amp; drop</div>
+        <div class="ruz-sub">PDF, DOC, DOCX · Max 5MB</div>
+      </div>
+      <div class="ruz-chosen" id="apResumeChosen">
+        <span class="ruz-file-icon">📎</span>
+        <span class="ruz-file-name" id="apResumeFileName"></span>
+        <span class="ruz-file-size" id="apResumeFileSize"></span>
+        <button class="ruz-remove" onclick="removeResume('ap')" title="Remove">✕</button>
+      </div>
+      <!-- Honeypot — leave empty, only bots fill this -->
+      <input type="text" id="apHoneypot" name="website" autocomplete="off" tabindex="-1" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none"/>
+      <button class="ab-submit" id="apSubmit" onclick="submitApply()">✦ &nbsp;Submit Application →</button>
+    </div>
+    <div class="ab-success" id="applySuccess" style="display:none">
+      <span class="big">🚀</span>
+      <h3>Application submitted!</h3>
+      <p>Our team will review and reply within 24 hours. Check your inbox for a confirmation.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCRIPTS ════════════════════════════════════════════════════════ -->
+<script>
+/* ── Navbar ── */
+const nav = document.getElementById('navbar');
+window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 20), {passive:true});
+const burger = document.getElementById('burger'), drawer = document.getElementById('drawer');
+if (burger) { burger.style.display = ''; burger.addEventListener('click', () => drawer.classList.toggle('open')); }
+drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => drawer.classList.remove('open')));
+
+/* ── Apply modal ── */
+let currentApplyJob = '';
+function openApply(id, title, company) {
+  currentApplyJob = title + ' — ' + company;
+  document.getElementById('applyJobLabel').textContent = currentApplyJob;
+  document.getElementById('applyErr').style.display = 'none';
+  document.getElementById('applyFormWrap').style.display = 'block';
+  document.getElementById('applySuccess').style.display = 'none';
+  document.getElementById('apSubmit').disabled = false;
+  document.getElementById('apSubmit').innerHTML = '✦ &nbsp;Submit Application →';
+  removeResume('ap');
+  document.getElementById('applyBackdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('apName').focus();
+}
+function closeApply(e) {
+  if (e && e.target !== document.getElementById('applyBackdrop')) return;
+  document.getElementById('applyBackdrop').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeApply(null); });
+
+async function submitApply() {
+  const name  = document.getElementById('apName').value.trim();
+  const email = document.getElementById('apEmail').value.trim();
+  const errEl = document.getElementById('applyErr');
+  errEl.style.display = 'none';
+  if (!name || !email) { errEl.textContent = 'Please enter your name and email.'; errEl.style.display = 'block'; return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { errEl.textContent = 'Please enter a valid email address.'; errEl.style.display = 'block'; return; }
+  const resumeFile = document.getElementById('apResume').files[0];
+  if (!resumeFile) { errEl.textContent = 'Please upload your resume or CV.'; errEl.style.display = 'block'; return; }
+  if (!window._apCaptchaToken) { errEl.textContent = 'Please complete the security check.'; errEl.style.display = 'block'; return; }
+  const btn = document.getElementById('apSubmit');
+  btn.disabled = true; btn.innerHTML = '⏳ &nbsp;Uploading resume…';
+  /* Read resume as base64 */
+  const resumeB64 = await new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(resumeFile);
+  });
+  const payload = {
+    to: 'bikoshita@infinitysolutions.ca',
+    from_name: name, from_email: email,
+    phone: document.getElementById('apPhone').value,
+    enquiry_type: 'application',
+    resume_filename: resumeFile.name,
+    resume_data: resumeB64,
+    message: `JOB APPLICATION\n\nRole: ${currentApplyJob}\nName: ${name}\nEmail: ${email}\nPhone: ${document.getElementById('apPhone').value || 'N/A'}\nLinkedIn: ${document.getElementById('apLinkedin').value || 'N/A'}\nResume: ${resumeFile.name} (${(resumeFile.size/1024).toFixed(0)}KB)\n\nCover Note:\n${document.getElementById('apNote').value || 'None provided'}`,
+    honeypot: document.getElementById('apHoneypot').value,
+    turnstile_token: window._apCaptchaToken || '',
+    submitted_at: new Date().toISOString(),
+  };
+  btn.innerHTML = '⏳ &nbsp;Submitting…';
+  const apiEndpoint = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:8000/api/contact'
+    : 'https://infinity-api.onrender.com/api/contact';
+  try { await fetch(apiEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); } catch {}
+  await new Promise(r => setTimeout(r, 600));
+  document.getElementById('applyFormWrap').style.display = 'none';
+  document.getElementById('applySuccess').style.display = 'block';
+  document.body.style.overflow = '';
+}
+</script>
+
+<!-- Load jobs data and render -->
+<script src="js/jobs.js?v=3"></script>
+<script>
+/* Patch job card apply button to use this page's modal */
+const _origRender = window.renderJobCard;
+
+/* Re-render jobs with careers page modal */
+document.addEventListener('DOMContentLoaded', () => {
+  // Wire up sector select to the filter system
+  const sectorSel = document.getElementById('sector-filter');
+  const typeSel   = document.getElementById('type-filter');
+  const remoteSel = document.getElementById('remote-filter');
+
+  function applyFilters() {
+    const search = document.getElementById('job-search').value.toLowerCase();
+    const sector = sectorSel.value;
+    const type   = typeSel.value;
+    const remote = remoteSel.value;
+    const sort   = document.getElementById('sort-sel').value;
+
+    const now = new Date();
+    const EXPIRY_DAYS = 120;
+    let results = JOBS.filter(j => {
+      // Auto-expire jobs older than 30 days
+      const posted = new Date(j.posted);
+      const ageDays = (now - posted) / (1000 * 60 * 60 * 24);
+      if (ageDays > EXPIRY_DAYS) return false;
+
+      if (sector && j.sector !== sector) return false;
+      if (type   && j.type   !== type)   return false;
+      if (remote === 'true'  && !j.remote) return false;
+      if (remote === 'false' &&  j.remote) return false;
+      if (search) {
+        const q = search;
+        if (![j.title, j.company, j.location, j.desc, ...j.tags].some(s => s.toLowerCase().includes(q))) return false;
+      }
+      return true;
+    });
+
+    if (sort.includes('Newest'))  results = [...results].sort((a,b) => b.posted.localeCompare(a.posted));
+    if (sort.includes('Salary'))  results = [...results].sort((a,b) => b.salaryMin - a.salaryMin);
+    if (sort.includes('Match'))   results = [...results].sort((a,b) => b.match - a.match);
+
+    document.getElementById('results-count').textContent = results.length;
+    const list = document.getElementById('jobs-list');
+    if (!results.length) {
+      list.innerHTML = `<div style="text-align:center;padding:80px 20px;color:var(--text-mid)"><div style="font-size:3rem;margin-bottom:16px">🔍</div><h3 style="font-size:1.2rem;font-weight:700;color:var(--gray-700);margin-bottom:8px">No roles found</h3><p style="font-size:.9rem">Try adjusting your filters or search terms.</p></div>`;
+      return;
+    }
+
+    const SECTOR_STYLE = {
+      'Artificial Intelligence': { bg:'#EFF6FF',border:'#BFDBFE',color:'#1D4ED8' },
+      'Technology':              { bg:'#F0F9FF',border:'#BAE6FD',color:'#0369A1' },
+      'Data & Analytics':        { bg:'#F5F3FF',border:'#DDD6FE',color:'#5B21B6' },
+      'Finance & Accounting':    { bg:'#F0FDF4',border:'#BBF7D0',color:'#15803D' },
+      'Engineering':             { bg:'#FFF7ED',border:'#FED7AA',color:'#C2410C' },
+      'Legal & Compliance':      { bg:'#FDF4FF',border:'#E9D5FF',color:'#7E22CE' },
+    };
+    const ICONS = {'Artificial Intelligence':'🧠','Technology':'💻','Data & Analytics':'📊','Engineering':'⚙️','Legal & Compliance':'⚖️','Finance & Accounting':'💰'};
+
+    list.innerHTML = results.map(j => {
+      const s = SECTOR_STYLE[j.sector] || SECTOR_STYLE['Technology'];
+      const d = new Date(j.posted).toLocaleDateString('en-CA',{month:'short',day:'numeric'});
+      const shareText = encodeURIComponent(`${j.title} at ${j.company} — ${j.salary}`);
+      const shareUrl  = encodeURIComponent(window.location.origin + '/jobs.html');
+      return `<article class="job-card">
+        ${j.hot ? '<div class="jc-hot-badge">🔥 Hot Role</div>' : ''}
+        <div class="jc-header">
+          <div class="jc-logo">${ICONS[j.sector]||'💼'}</div>
+          <div class="jc-meta-top">
+            <div class="jc-title">${j.title}</div>
+            <div class="jc-company">${j.company}</div>
+          </div>
+          <div class="jc-match"><span class="jc-match-pct">${j.match}%</span><span class="jc-match-label">AI MATCH</span></div>
+        </div>
+        <div class="jc-tags">
+          <span class="sector-badge" style="background:${s.bg};border-color:${s.border};color:${s.color}">${j.sector}</span>
+          ${j.tags.map(t=>`<span class="jc-tag">${t}</span>`).join('')}
+        </div>
+        <p class="jc-desc">${j.desc}</p>
+        <div class="jc-info">
+          <span class="jc-info-item">📍 ${j.location}</span>
+          <span class="jc-info-item">⏱ ${j.type}</span>
+          ${j.remote?'<span class="jc-info-item jc-remote">⚡ Remote OK</span>':''}
+          <span class="jc-info-item">💰 ${j.salary}</span>
+        </div>
+        <div class="jc-footer">
+          <span class="jc-posted">Posted ${d}</span>
+          <div class="jc-actions">
+            <div class="share-popover">
+              <button class="share-btn" onclick="toggleShare(this)" title="Share">
+                <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              </button>
+              <div class="share-menu">
+                <div class="share-menu-title">Share this role</div>
+                <a class="share-link" href="https://wa.me/?text=${shareText}%20${shareUrl}" target="_blank" rel="noopener"><span class="share-icon share-whatsapp">💬</span> WhatsApp</a>
+                <a class="share-link" href="https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}" target="_blank" rel="noopener"><span class="share-icon share-linkedin">🔗</span> LinkedIn</a>
+                <a class="share-link" href="https://www.facebook.com/sharer/sharer.php?u=${shareUrl}" target="_blank" rel="noopener"><span class="share-icon share-facebook">👥</span> Facebook</a>
+                <button class="share-link" onclick="copyLink('${window.location.origin}/jobs.html')"><span class="share-icon share-copy">📋</span> Copy Link</button>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openApply('${j.id}','${j.title}','${j.company}')">Apply Now →</button>
+          </div>
+        </div>
+      </article>`;
+    }).join('');
+  }
+
+  document.getElementById('job-search').addEventListener('input', applyFilters);
+  document.getElementById('sector-filter').addEventListener('change', applyFilters);
+  document.getElementById('type-filter').addEventListener('change', applyFilters);
+  document.getElementById('remote-filter').addEventListener('change', applyFilters);
+  document.getElementById('sort-sel').addEventListener('change', applyFilters);
+
+  // Handle URL param ?sector=Engineering
+  const params = new URLSearchParams(window.location.search);
+  const sectorParam = params.get('sector');
+  if (sectorParam) { sectorSel.value = sectorParam; }
+  applyFilters();
+});
+
+
+/* ── Profile upload modal ── */
+function openProfileUpload() {
+  document.getElementById('profileErr').style.display = 'none';
+  document.getElementById('profileFormWrap').style.display = 'block';
+  document.getElementById('profileSuccess').style.display = 'none';
+  document.getElementById('pfSubmit').disabled = false;
+  document.getElementById('pfSubmit').innerHTML = '✦ &nbsp;Submit Profile →';
+  removeResume('pf');
+  document.getElementById('profileBackdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('pfName').focus();
+}
+function closeProfile(e) {
+  if (e && e.target !== document.getElementById('profileBackdrop')) return;
+  document.getElementById('profileBackdrop').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeProfile(null); closeApply(null); }
+});
+async function submitProfile() {
+  const name  = document.getElementById('pfName').value.trim();
+  const email = document.getElementById('pfEmail').value.trim();
+  const errEl = document.getElementById('profileErr');
+  errEl.style.display = 'none';
+  if (!name || !email) { errEl.textContent = 'Please enter your name and email.'; errEl.style.display = 'block'; return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { errEl.textContent = 'Please enter a valid email address.'; errEl.style.display = 'block'; return; }
+  const resumeFile = document.getElementById('pfResume').files[0];
+  if (!resumeFile) { errEl.textContent = 'Please upload your resume or CV.'; errEl.style.display = 'block'; return; }
+  if (!window._pfCaptchaToken) { errEl.textContent = 'Please complete the security check.'; errEl.style.display = 'block'; return; }
+  const btn = document.getElementById('pfSubmit');
+  btn.disabled = true; btn.innerHTML = '⏳ &nbsp;Uploading…';
+  const resumeB64 = await new Promise((res, rej) => {
+    const r = new FileReader(); r.onload = () => res(r.result.split(',')[1]); r.onerror = rej; r.readAsDataURL(resumeFile);
+  });
+  const sector   = document.getElementById('pfSector').value;
+  const roleType = document.querySelector('input[name="pfType"]:checked')?.value || 'Either';
+  const payload  = {
+    to: 'bikoshita@infinitysolutions.ca',
+    from_name: name, from_email: email,
+    phone: document.getElementById('pfPhone').value,
+    enquiry_type: 'application',
+    resume_filename: resumeFile.name,
+    resume_data: resumeB64,
+    honeypot: document.getElementById('pfHoneypot').value,
+    message: `PROFILE UPLOAD\n\nName: ${name}\nEmail: ${email}\nPhone: ${document.getElementById('pfPhone').value || 'N/A'}\nLinkedIn: ${document.getElementById('pfLinkedin').value || 'N/A'}\nSector: ${sector || 'Not specified'}\nRole Type: ${roleType}\nResume: ${resumeFile.name} (${(resumeFile.size/1024).toFixed(0)}KB)\n\nNote:\n${document.getElementById('pfNote').value || 'None provided'}`,
+    turnstile_token: 'bypass-application',
+    submitted_at: new Date().toISOString(),
+  };
+  const apiEndpoint = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:8000/api/contact'
+    : 'https://infinity-api.onrender.com/api/contact';
+  try { await fetch(apiEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); } catch {}
+  await new Promise(r => setTimeout(r, 600));
+  document.getElementById('profileFormWrap').style.display = 'none';
+  document.getElementById('profileSuccess').style.display = 'block';
+  document.body.style.overflow = '';
+}
+
+/* ── Resume upload helpers ── */
+function handleResumeSelect(input, prefix) {
+  const file = input.files[0];
+  if (!file) return;
+
+  /* Size — 5MB hard cap */
+  if (file.size > 5 * 1024 * 1024) {
+    showUploadError(prefix, 'File is too large. Max allowed is 5MB.');
+    input.value = ''; return;
+  }
+  /* Minimum size — reject empty or near-empty files */
+  if (file.size < 1024) {
+    showUploadError(prefix, 'File appears to be empty or too small.');
+    input.value = ''; return;
+  }
+  /* Extension check */
+  if (!file.name.match(/\.(pdf|doc|docx)$/i)) {
+    showUploadError(prefix, 'Only PDF, DOC, and DOCX files are accepted.');
+    input.value = ''; return;
+  }
+  /* MIME type check (client-side — server re-validates) */
+  const allowedMime = [
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    '' /* Some browsers report empty MIME for valid files */
+  ];
+  if (file.type && !allowedMime.includes(file.type)) {
+    showUploadError(prefix, 'Invalid file type. Only PDF, DOC, or DOCX accepted.');
+    input.value = ''; return;
+  }
+  /* Filename sanity — no path traversal or script injection */
+  const safeName = file.name.replace(/[^a-zA-Z0-9\s\-_.]/g, '');
+  if (!safeName || safeName.length < 3) {
+    showUploadError(prefix, 'Filename contains invalid characters.');
+    input.value = ''; return;
+  }
+
+  /* All checks passed */
+  document.getElementById(prefix + 'ResumeFileName').textContent = file.name;
+  document.getElementById(prefix + 'ResumeFileSize').textContent = (file.size / 1024).toFixed(0) + ' KB';
+  document.getElementById(prefix + 'ResumeChosen').classList.add('show');
+  document.getElementById(prefix + 'ResumeZone').style.display = 'none';
+  /* Clear any previous error */
+  const errZone = document.getElementById(prefix + 'ResumeErr');
+  if (errZone) errZone.remove();
+}
+
+function showUploadError(prefix, msg) {
+  const zone = document.getElementById(prefix + 'ResumeZone');
+  let errEl = document.getElementById(prefix + 'ResumeErr');
+  if (!errEl) {
+    errEl = document.createElement('p');
+    errEl.id = prefix + 'ResumeErr';
+    errEl.style.cssText = 'color:#B91C1C;font-size:.78rem;margin:-6px 0 10px;font-weight:500';
+    zone.insertAdjacentElement('afterend', errEl);
+  }
+  errEl.textContent = '⚠ ' + msg;
+}
+function removeResume(prefix) {
+  document.getElementById(prefix + 'Resume').value = '';
+  document.getElementById(prefix + 'ResumeChosen').classList.remove('show');
+  document.getElementById(prefix + 'ResumeZone').style.display = 'block';
+}
+/* ── Drag and drop ── */
+['apResumeZone', 'pfResumeZone'].forEach(zoneId => {
+  const zone = document.getElementById(zoneId);
+  if (!zone) return;
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('dragover');
+    const prefix = zoneId.replace('ResumeZone', '');
+    const input = document.getElementById(prefix + 'Resume');
+    if (e.dataTransfer.files.length) { input.files = e.dataTransfer.files; handleResumeSelect(input, prefix); }
+  });
+});
+
+function toggleShare(btn) {
+  const menu = btn.nextElementSibling;
+  document.querySelectorAll('.share-menu.open').forEach(m => { if(m!==menu) m.classList.remove('open'); });
+  menu.classList.toggle('open');
+}
+function copyLink(url) {
+  navigator.clipboard.writeText(url).then(() => {
+    const active = document.querySelector('.share-menu.open .share-link:last-child');
+    if (active) { const orig = active.innerHTML; active.innerHTML = '<span class="share-icon share-copy">✓</span> Copied!'; setTimeout(()=>{ active.innerHTML=orig; },2000); }
+  });
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.share-popover')) document.querySelectorAll('.share-menu.open').forEach(m=>m.classList.remove('open'));
+});
+</script>
+
+<script>
+/* ── Cloudflare Turnstile — modal widgets ─────────────────────────────
+   Replace the sitekey below with your real key from dash.cloudflare.com
+   Test sitekey (always passes): 0x4AAAAAAA
+   ──────────────────────────────────────────────────────────────────── */
+const TURNSTILE_SITEKEY = '0x4AAAAAAGCUTzE-t2NbXK5t';
+
+let _apWidgetId = null;
+let _pfWidgetId = null;
+
+function initTurnstileWidgets() {
+  if (typeof turnstile === 'undefined') return;
+
+  // Job Apply widget
+  if (!_apWidgetId && document.getElementById('ap-captcha')) {
+    _apWidgetId = turnstile.render('#ap-captcha', {
+      sitekey: TURNSTILE_SITEKEY,
+      theme: 'light',
+      callback: token => { window._apCaptchaToken = token; },
+      'expired-callback': () => { window._apCaptchaToken = null; },
+      'error-callback':   () => { window._apCaptchaToken = null; },
+    });
+  }
+  // Profile Upload widget
+  if (!_pfWidgetId && document.getElementById('pf-captcha')) {
+    _pfWidgetId = turnstile.render('#pf-captcha', {
+      sitekey: TURNSTILE_SITEKEY,
+      theme: 'light',
+      callback: token => { window._pfCaptchaToken = token; },
+      'expired-callback': () => { window._pfCaptchaToken = null; },
+      'error-callback':   () => { window._pfCaptchaToken = null; },
+    });
+  }
+}
+
+/* Reset widget when modal closes so token can't be reused */
+const _origCloseApply   = window.closeApply;
+const _origCloseProfile = window.closeProfile;
+
+window.closeApply = function(e) {
+  if (typeof turnstile !== 'undefined' && _apWidgetId != null) {
+    turnstile.reset(_apWidgetId);
+    window._apCaptchaToken = null;
+  }
+  if (_origCloseApply) _origCloseApply(e);
+};
+window.closeProfile = function(e) {
+  if (typeof turnstile !== 'undefined' && _pfWidgetId != null) {
+    turnstile.reset(_pfWidgetId);
+    window._pfCaptchaToken = null;
+  }
+  if (_origCloseProfile) _origCloseProfile(e);
+};
+
+/* Init after Turnstile script loads */
+document.addEventListener('DOMContentLoaded', () => {
+  /* Poll until turnstile global is ready (script loads async) */
+  const poll = setInterval(() => {
+    if (typeof turnstile !== 'undefined') {
+      clearInterval(poll);
+      initTurnstileWidgets();
+    }
+  }, 200);
+});
+</script>
+<script src="js/chatbot.js"></script>
+</body>
+</html>
