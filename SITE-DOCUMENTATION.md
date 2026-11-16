@@ -34,10 +34,10 @@ The site is a **static HTML website** — no WordPress, no CMS, no complex serve
 | Jobs | `jobs.html` | Ceipal live feed + curated job listings |
 | Services | `services-ai.html` | Accordion by sector, featured job cards |
 | About | `about-ai.html` | Team, process, values |
-| Contact | `contact-ai.html` | Contact form → `account@infinitysolutions.ca` |
+| Contact | `contact-ai.html` | Contact form → `accounts@infinitysolutions.ca` |
 
 **Email routing:**
-- Contact form → `account@infinitysolutions.ca`
+- Contact form → `accounts@infinitysolutions.ca`
 - All job applications (Jobs page + Services page) → `bikoshita@infinitysolutions.ca`
 
 **AI Chatbot:** Aria — powered by Claude API, floats on every page, knows all 6 sectors.
@@ -84,7 +84,7 @@ The site runs entirely without a database. Here is exactly what is stored where:
 | Data | Where it lives | How to update |
 |---|---|---|
 | Job listings | `js/jobs.js` (plain text file) | Edit the file in VS Code |
-| Contact form submissions | Email inbox (`account@infinitysolutions.ca`) | Check your email |
+| Contact form submissions | Email inbox (`accounts@infinitysolutions.ca`) | Check your email |
 | Job applications | Email inbox (`bikoshita@infinitysolutions.ca`) | Check your email |
 | Live jobs from Ceipal | Ceipal ATS (their cloud) | Manage in Ceipal dashboard |
 | Site content | HTML files | Edit in VS Code |
@@ -293,7 +293,7 @@ Increase `700px` to `900px` or `1100px` until all jobs are visible.
 
 ## 7. How to Set Up the Contact Form Email
 
-The contact form sends to `account@infinitysolutions.ca` via the FastAPI backend.
+The contact form sends to `accounts@infinitysolutions.ca` via the FastAPI backend.
 
 ### Requirements
 
@@ -331,7 +331,7 @@ The backend runs at `http://localhost:8000`. When deployed, your site's form wil
 
 Open `backend/main.py`, find this line and update it:
 ```python
-TO_EMAIL = "account@infinitysolutions.ca"
+TO_EMAIL = "accounts@infinitysolutions.ca"
 ```
 
 ### To change where applications go

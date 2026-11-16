@@ -2,7 +2,7 @@
 
 ## What's New
 - ✦ AI Chatbot (Aria) on every page — powered by Claude API
-- ✦ Contact form emails account@infinitysolutions.ca (no public phone/email shown)
+- ✦ Contact form emails accounts@infinitysolutions.ca (no public phone/email shown)
 - ✦ Cloudflare Turnstile CAPTCHA on contact form (free, no puzzles)
 - ✦ Hero with stunning background image + dark overlay
 - ✦ Professional Asian/white imagery throughout

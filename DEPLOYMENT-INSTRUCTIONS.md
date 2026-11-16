@@ -39,7 +39,7 @@
 ## Part 2 — Deploy the Backend (Email + CAPTCHA API)
 
 The backend is needed for:
-- Contact form sending email to `account@infinitysolutions.ca`
+- Contact form sending email to `accounts@infinitysolutions.ca`
 - Job applications sending email + resume to `bikoshita@infinitysolutions.ca`
 - Server-side Cloudflare Turnstile CAPTCHA verification
 
@@ -148,7 +148,7 @@ The developer should test each of these before handing over:
 - [ ] `https://infinitysolutions.ca` loads correctly
 - [ ] `https://infinitysolutions.ca/jobs.html` shows all job listings
 - [ ] `https://infinitysolutions.ca/services-ai.html` accordion opens correctly
-- [ ] Contact form on `contact-ai.html` — submit a test message, confirm email arrives at `account@infinitysolutions.ca`
+- [ ] Contact form on `contact-ai.html` — submit a test message, confirm email arrives at `accounts@infinitysolutions.ca`
 - [ ] Apply Now on a job — upload a PDF resume, confirm email + attachment arrives at `bikoshita@infinitysolutions.ca`
 - [ ] Upload Profile button — confirm it opens a modal (not redirect to contact page)
 - [ ] Aria chatbot — click the blue chat button bottom-right, send a message, confirm it responds

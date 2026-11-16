@@ -297,7 +297,7 @@ function setType(btn) {
   document.getElementById('msgType').value = btn.dataset.t;
 }
 
-/* ── Form submit — sends email to account@infinitysolutions.ca ── */
+/* ── Form submit — sends email to accounts@infinitysolutions.ca ── */
 document.getElementById('contactForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const errBox = document.getElementById('errBox');
@@ -341,11 +341,11 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
 
   /* ── Email via backend (FastAPI) or EmailJS fallback ──
      When connected to FastAPI backend, POST to /api/contact
-     The backend then uses SMTP / SendGrid to email account@infinitysolutions.ca
+     The backend then uses SMTP / SendGrid to email accounts@infinitysolutions.ca
      For now we simulate success and show the confirmation screen.         */
   try {
     const payload = {
-      to:       'account@infinitysolutions.ca',
+      to:       'accounts@infinitysolutions.ca',
       from_name: name,
       from_email: email,
       phone,

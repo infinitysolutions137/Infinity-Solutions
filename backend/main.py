@@ -25,7 +25,7 @@ from collections import defaultdict
 # ── Config ────────────────────────────────────────────────────────────
 ALLOWED_ORIGINS   = os.getenv("ALLOWED_ORIGINS", "https://infinitysolutions.ca,http://localhost:3000,http://127.0.0.1:3000,http://localhost:8000,http://127.0.0.1:8000").split(",")
 TO_EMAIL          = os.getenv("TO_EMAIL", "bikoshita@infinitysolutions.ca")
-CONTACT_EMAIL     = os.getenv("CONTACT_EMAIL", "account@infinitysolutions.ca")
+CONTACT_EMAIL     = os.getenv("CONTACT_EMAIL", "accounts@infinitysolutions.ca")
 SMTP_HOST         = os.getenv("SMTP_HOST", "smtp.gmail.com")
 SMTP_PORT         = int(os.getenv("SMTP_PORT", "587"))
 SMTP_USER         = os.getenv("SMTP_USER", "").strip()
