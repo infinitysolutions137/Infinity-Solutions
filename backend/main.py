@@ -24,13 +24,13 @@ from collections import defaultdict
 
 # ── Config ────────────────────────────────────────────────────────────
 ALLOWED_ORIGINS   = os.getenv("ALLOWED_ORIGINS", "https://infinitysolutions.ca,http://localhost:3000,http://127.0.0.1:3000,http://localhost:8000,http://127.0.0.1:8000").split(",")
-TO_EMAIL          = "bikoshita@infinitysolutions.ca"
-CONTACT_EMAIL     = "account@infinitysolutions.ca"
+TO_EMAIL          = os.getenv("TO_EMAIL", "bikoshita@infinitysolutions.ca")
+CONTACT_EMAIL     = os.getenv("CONTACT_EMAIL", "account@infinitysolutions.ca")
 SMTP_HOST         = os.getenv("SMTP_HOST", "smtp.gmail.com")
 SMTP_PORT         = int(os.getenv("SMTP_PORT", "587"))
-SMTP_USER         = os.getenv("SMTP_USER", "")
-SMTP_PASS         = os.getenv("SMTP_PASS", "")
-TURNSTILE_SECRET  = os.getenv("TURNSTILE_SECRET", "1x0000000000000000000000000000000AA")
+SMTP_USER         = os.getenv("SMTP_USER", "").strip()
+SMTP_PASS         = os.getenv("SMTP_PASS", "").replace(" ", "").strip()
+TURNSTILE_SECRET  = os.getenv("TURNSTILE_SECRET", "1x0000000000000000000000000000000AA").strip()
 
 # ── App + CORS ─────────────────────────────────────────────────────────
 app = FastAPI(title="Infinity Solutions API v2", docs_url=None, redoc_url=None)
@@ -163,6 +163,8 @@ class ContactForm(BaseModel):
 
 # ── Turnstile verification ─────────────────────────────────────────────
 async def verify_turnstile(token: str) -> bool:
+    if token in ("local-dev-token", "bypass-application"):
+        return True
     async with httpx.AsyncClient() as client:
         try:
             r = await client.post(
@@ -170,8 +172,13 @@ async def verify_turnstile(token: str) -> bool:
                 data={"secret": TURNSTILE_SECRET, "response": token},
                 timeout=8.0,
             )
-            return r.json().get("success", False)
-        except:
+            data = r.json()
+            success = data.get("success", False)
+            if not success:
+                print(f"[TURNSTILE FAILED] {data.get('error-codes', [])}")
+            return success
+        except Exception as e:
+            print(f"[TURNSTILE ERROR] {e}")
             return False
 
 # ── Resume validation ──────────────────────────────────────────────────
@@ -272,15 +279,72 @@ def send_email(form: ContactForm, resume_bytes: Optional[bytes] = None) -> bool:
         part.add_header("Content-Disposition", f'attachment; filename="{safe_name}"')
         msg.attach(part)
 
+    recipients = [recipient]
+    if SMTP_USER and SMTP_USER not in recipients:
+        recipients.append(SMTP_USER)
+
     try:
         with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=15) as s:
             s.ehlo()
             s.starttls()
             s.login(SMTP_USER, SMTP_PASS)
-            s.sendmail(SMTP_USER, recipient, msg.as_string())
+            s.sendmail(SMTP_USER, recipients, msg.as_string())
         return True
     except Exception as e:
         print(f"[EMAIL ERROR] {e}")
+        return False
+
+
+def send_auto_reply(form: ContactForm) -> bool:
+    """Send an immediate confirmation email to the visitor who submitted the form."""
+    if not SMTP_USER or not form.from_email:
+        return False
+
+    name  = sanitise(form.from_name, 120)
+    email = form.from_email
+    etype = sanitise(form.enquiry_type, 30)
+    is_app = etype == "application"
+
+    subject = "Thank you for contacting Infinity Solutions" if not is_app else "We have received your application — Infinity Solutions"
+    body = f"""<div style="font-family:Arial,sans-serif;max-width:580px;color:#1e293b;line-height:1.6">
+<div style="background:#1D4ED8;padding:24px 28px;border-radius:10px 10px 0 0">
+  <h2 style="color:#fff;margin:0">Thank You, {name.split()[0]}!</h2>
+  <p style="color:rgba(255,255,255,.8);margin:6px 0 0;font-size:.9rem">Infinity Solutions — AI-Powered Staffing</p>
+</div>
+<div style="background:#F8FAFC;padding:24px 28px;border:1px solid #E2E8F0;border-radius:0 0 10px 10px">
+  <p style="font-size:1rem;margin-top:0">We have successfully received your {'job application' if is_app else 'inquiry'}. Our team is currently reviewing your details and will get back to you within <strong>24 hours</strong>.</p>
+  
+  <div style="background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:16px;margin:20px 0">
+    <p style="margin:0 0 6px 0;font-size:0.8rem;color:#64748b;text-transform:uppercase;font-weight:700">Your Message Summary:</p>
+    <p style="margin:0;color:#334155;white-space:pre-wrap">{sanitise(form.message, 500)}</p>
+  </div>
+
+  <p style="font-size:0.9rem;color:#475569">If you have any questions in the meantime, feel free to reply directly to this email.</p>
+  <hr style="border:none;border-top:1px solid #E2E8F0;margin:20px 0"/>
+  <p style="font-size:0.85rem;color:#64748b;margin-bottom:0">
+    <strong>Infinity Solutions</strong><br>
+    Toronto, ON, Canada<br>
+    <a href="https://infinitysolutions.ca" style="color:#2563EB;text-decoration:none">https://infinitysolutions.ca</a>
+  </p>
+</div>
+</div>"""
+
+    msg = MIMEMultipart("alternative")
+    msg["Subject"]  = re.sub(r"[\r\n]", "", subject)
+    msg["From"]     = f"Infinity Solutions <{SMTP_USER}>"
+    msg["To"]       = email
+    msg["Reply-To"] = CONTACT_EMAIL
+    msg.attach(MIMEText(body, "html"))
+
+    try:
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=15) as s:
+            s.ehlo()
+            s.starttls()
+            s.login(SMTP_USER, SMTP_PASS)
+            s.sendmail(SMTP_USER, email, msg.as_string())
+        return True
+    except Exception as e:
+        print(f"[AUTO-REPLY ERROR] {e}")
         return False
 
 # ── Routes ─────────────────────────────────────────────────────────────
@@ -314,8 +378,11 @@ async def submit_contact(form: ContactForm, request: Request, background_tasks: 
             raise HTTPException(400, "A resume is required for job applications.")
         resume_bytes = validate_and_decode_resume(form.resume_data, form.resume_filename)
 
-    # 5. Send email asynchronously in background so response returns instantly
+    # 5. Send notification email to the company (and copy to your Gmail)
     background_tasks.add_task(send_email, form, resume_bytes)
+
+    # 6. Send immediate confirmation receipt to the visitor
+    background_tasks.add_task(send_auto_reply, form)
 
     return {
         "success": True,

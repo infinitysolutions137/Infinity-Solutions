@@ -367,7 +367,12 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      if (res.ok) sent = true;
+      if (res.ok) {
+        sent = true;
+      } else {
+        const errJson = await res.json().catch(() => ({}));
+        console.warn('Backend responded with status:', res.status, errJson);
+      }
     } catch {}
 
     /* Static-site fallback: use mailto as last resort */
