@@ -10,7 +10,7 @@ Security layers:
   7. Honeypot field rejection
 """
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, field_validator
 from typing import Optional
@@ -273,7 +273,7 @@ def send_email(form: ContactForm, resume_bytes: Optional[bytes] = None) -> bool:
         msg.attach(part)
 
     try:
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as s:
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=15) as s:
             s.ehlo()
             s.starttls()
             s.login(SMTP_USER, SMTP_PASS)
@@ -291,7 +291,7 @@ def root():
 
 
 @app.post("/api/contact", status_code=201)
-async def submit_contact(form: ContactForm, request: Request):
+async def submit_contact(form: ContactForm, request: Request, background_tasks: BackgroundTasks):
 
     # 1. Honeypot — bots fill hidden fields, humans don't
     if form.honeypot:
@@ -314,11 +314,10 @@ async def submit_contact(form: ContactForm, request: Request):
             raise HTTPException(400, "A resume is required for job applications.")
         resume_bytes = validate_and_decode_resume(form.resume_data, form.resume_filename)
 
-    # 5. Send email
-    if not send_email(form, resume_bytes):
-        raise HTTPException(500, "Failed to send. Please try again or email us directly.")
+    # 5. Send email asynchronously in background so response returns instantly
+    background_tasks.add_task(send_email, form, resume_bytes)
 
     return {
         "success": True,
-        "message": "Your application has been received. We'll reply within 24 hours.",
+        "message": "Your message has been received. We'll reply within 24 hours.",
     }
