@@ -1,8 +1,9 @@
 """
 Infinity Solutions v2 — FastAPI Backend (Hardened)
+Email delivery: SMTP (ports 2525 → 587 → 465 → 25) with Brevo HTTP API fallback
 Security layers:
   1. Cloudflare Turnstile CAPTCHA verification (server-side)
-  2. Rate limiting — 5 submissions per IP per 10 minutes
+  2. Rate limiting — 30 submissions per IP per 10 minutes
   3. Input sanitisation — length caps, HTML stripping, injection blocking
   4. Resume validation — magic bytes check, filename sanitisation, 5MB hard cap
   5. Email header injection prevention
@@ -22,12 +23,12 @@ from email import encoders
 from datetime import datetime
 from collections import defaultdict
 
+# ── IPv4-only SMTP classes (prevents [Errno 101] on dual-stack containers) ──
 class IPv4SMTP(smtplib.SMTP):
-    """Force IPv4 connection to prevent [Errno 101] Network is unreachable on dual-stack cloud containers."""
     def _get_socket(self, host, port, timeout):
         err = None
         for res in socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM):
-            af, socktype, proto, canonname, sa = res
+            af, socktype, proto, _, sa = res
             sock = None
             try:
                 sock = socket.socket(af, socktype, proto)
@@ -45,11 +46,10 @@ class IPv4SMTP(smtplib.SMTP):
 
 
 class IPv4SMTP_SSL(smtplib.SMTP_SSL):
-    """Force IPv4 connection over SSL (port 465)."""
     def _get_socket(self, host, port, timeout):
         err = None
         for res in socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM):
-            af, socktype, proto, canonname, sa = res
+            af, socktype, proto, _, sa = res
             sock = None
             try:
                 sock = socket.socket(af, socktype, proto)
@@ -67,43 +67,119 @@ class IPv4SMTP_SSL(smtplib.SMTP_SSL):
 
 
 def send_via_smtp(recipient: str, msg_str: str) -> tuple[bool, str]:
-    """Attempt sending via port 465 (SSL) first, falling back to 587 (STARTTLS)."""
-    ports = [465, 587]
+    """
+    Try SMTP ports in order: 2525 (STARTTLS), 587 (STARTTLS), 465 (SSL), 25 (plain).
+    Port 2525 is often open on cloud providers that block 465/587.
+    Returns (success, info_string).
+    """
+    attempts = [
+        (2525, "STARTTLS"),
+        (587,  "STARTTLS"),
+        (465,  "SSL"),
+        (25,   "plain"),
+    ]
     errors = []
-    for p in ports:
+
+    for port, mode in attempts:
         try:
-            if p == 465:
-                with IPv4SMTP_SSL(SMTP_HOST, 465, timeout=10) as s:
+            if mode == "SSL":
+                with IPv4SMTP_SSL(SMTP_HOST, port, timeout=12) as s:
                     s.login(SMTP_USER, SMTP_PASS)
                     s.sendmail(SMTP_USER, [recipient], msg_str)
-            else:
-                with IPv4SMTP(SMTP_HOST, 587, timeout=10) as s:
+            elif mode == "STARTTLS":
+                with IPv4SMTP(SMTP_HOST, port, timeout=12) as s:
                     s.ehlo()
                     s.starttls()
+                    s.ehlo()
                     s.login(SMTP_USER, SMTP_PASS)
                     s.sendmail(SMTP_USER, [recipient], msg_str)
-            print(f"[EMAIL SUCCESS] Delivered to {recipient} via port {p}", flush=True)
-            return True, f"Delivered via port {p}"
+            else:  # plain
+                with IPv4SMTP(SMTP_HOST, port, timeout=12) as s:
+                    s.ehlo()
+                    s.login(SMTP_USER, SMTP_PASS)
+                    s.sendmail(SMTP_USER, [recipient], msg_str)
+
+            print(f"[SMTP OK] Delivered to {recipient} via port {port} ({mode})", flush=True)
+            return True, f"Delivered via SMTP port {port} ({mode})"
+
         except Exception as e:
-            err_msg = f"Port {p} failed: {type(e).__name__} ({e})"
+            err_msg = f"Port {port} ({mode}): {type(e).__name__}: {e}"
             errors.append(err_msg)
-            print(f"[SMTP FAIL] {recipient} on {err_msg}", flush=True)
+            print(f"[SMTP FAIL] {recipient} — {err_msg}", flush=True)
+
     return False, " | ".join(errors)
 
-# ── Config ────────────────────────────────────────────────────────────
-ALLOWED_ORIGINS   = os.getenv(
+
+# ── Brevo HTTP API fallback (port 443 — always open) ───────────────────
+BREVO_API_KEY = os.getenv("BREVO_API_KEY", "").strip()
+BREVO_API_URL = "https://api.brevo.com/v3/smtp/email"
+
+
+async def send_via_brevo(
+    to_email: str,
+    to_name: str,
+    subject: str,
+    html_body: str,
+    reply_to_email: str = "",
+    attachment_bytes: Optional[bytes] = None,
+    attachment_name: Optional[str] = None,
+) -> tuple[bool, str]:
+    """Fallback: Brevo HTTP API over port 443."""
+    if not BREVO_API_KEY:
+        return False, "No BREVO_API_KEY configured"
+
+    payload: dict = {
+        "sender":      {"name": "Infinity Solutions", "email": SENDER_EMAIL},
+        "to":          [{"email": to_email, "name": to_name}],
+        "subject":     subject,
+        "htmlContent": html_body,
+    }
+    if reply_to_email:
+        payload["replyTo"] = {"email": reply_to_email}
+    if attachment_bytes and attachment_name:
+        payload["attachment"] = [{
+            "content": base64.b64encode(attachment_bytes).decode(),
+            "name":    safe_filename(attachment_name),
+        }]
+
+    headers = {
+        "api-key":      BREVO_API_KEY,
+        "Content-Type": "application/json",
+        "Accept":       "application/json",
+    }
+    try:
+        async with httpx.AsyncClient(timeout=20.0) as client:
+            r = await client.post(BREVO_API_URL, json=payload, headers=headers)
+        if r.status_code in (200, 201):
+            print(f"[BREVO OK] Delivered to {to_email}", flush=True)
+            return True, f"Delivered via Brevo (HTTP {r.status_code})"
+        else:
+            msg = f"Brevo API error {r.status_code}: {r.text}"
+            print(f"[BREVO FAIL] {to_email} → {msg}", flush=True)
+            return False, msg
+    except Exception as e:
+        msg = f"Brevo exception: {type(e).__name__}: {e}"
+        print(f"[BREVO ERROR] {to_email} → {msg}", flush=True)
+        return False, msg
+
+
+# ── Config ─────────────────────────────────────────────────────────────
+ALLOWED_ORIGINS  = os.getenv(
     "ALLOWED_ORIGINS",
     "https://infinitysolutions.ca,https://www.infinitysolutions.ca,http://infinitysolutions.ca,http://www.infinitysolutions.ca,http://localhost:3000,http://127.0.0.1:3000,http://localhost:8000,http://127.0.0.1:8000"
 ).split(",")
-TO_EMAIL          = os.getenv("TO_EMAIL", "bikoshita@infinitysolutions.ca")
-CONTACT_EMAIL     = os.getenv("CONTACT_EMAIL", "accounts@infinitysolutions.ca")
-SMTP_HOST         = os.getenv("SMTP_HOST", "smtp.gmail.com")
-SMTP_PORT         = int(os.getenv("SMTP_PORT", "587"))
-SMTP_USER         = os.getenv("SMTP_USER", "").strip()
-SMTP_PASS         = os.getenv("SMTP_PASS", "").replace(" ", "").strip()
-TURNSTILE_SECRET  = os.getenv("TURNSTILE_SECRET", "1x0000000000000000000000000000000AA").strip()
 
-# ── App + CORS ─────────────────────────────────────────────────────────
+TO_EMAIL         = os.getenv("TO_EMAIL",      "bikoshita@infinitysolutions.ca")
+CONTACT_EMAIL    = os.getenv("CONTACT_EMAIL", "accounts@infinitysolutions.ca")
+CC_EMAIL         = os.getenv("CC_EMAIL",      "infinitysolutions137@gmail.com")
+SENDER_EMAIL     = os.getenv("SMTP_USER",     "infinitysolutions137@gmail.com").strip()
+SMTP_HOST        = os.getenv("SMTP_HOST",     "smtp.gmail.com")
+SMTP_PORT        = int(os.getenv("SMTP_PORT", "587"))
+SMTP_USER        = os.getenv("SMTP_USER",     "").strip()
+SMTP_PASS        = os.getenv("SMTP_PASS",     "").replace(" ", "").strip()
+TURNSTILE_SECRET = os.getenv("TURNSTILE_SECRET", "1x0000000000000000000000000000000AA").strip()
+
+# ── App + CORS ──────────────────────────────────────────────────────────
 app = FastAPI(title="Infinity Solutions API v2", docs_url=None, redoc_url=None)
 
 app.add_middleware(
@@ -115,10 +191,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ── Rate limiter — in-memory, per IP ──────────────────────────────────
-# Allows 30 requests per IP per 10 minutes (generous for testing)
-RATE_WINDOW   = 600   # seconds
-RATE_LIMIT    = 30
+# ── Rate limiter ────────────────────────────────────────────────────────
+RATE_WINDOW  = 600
+RATE_LIMIT   = 30
 _rate_store: dict = defaultdict(list)
 
 def check_rate_limit(ip: str) -> bool:
@@ -130,30 +205,23 @@ def check_rate_limit(ip: str) -> bool:
     _rate_store[ip].append(now)
     return True
 
-# ── Allowed file types ─────────────────────────────────────────────────
-# Magic bytes (file signatures) for PDF, DOC, DOCX
-ALLOWED_MIME_TYPES = {
-    "application/pdf",
-    "application/msword",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-}
+# ── Allowed file types ──────────────────────────────────────────────────
 ALLOWED_EXTENSIONS = {".pdf", ".doc", ".docx"}
-MAX_RESUME_BYTES   = 5 * 1024 * 1024   # 5 MB hard cap
+MAX_RESUME_BYTES   = 5 * 1024 * 1024
 
 FILE_MAGIC = {
-    b"%PDF":                  "pdf",   # PDF
-    b"\xd0\xcf\x11\xe0":     "doc",   # DOC (OLE2)
-    b"PK\x03\x04":           "docx",  # DOCX (ZIP-based)
+    b"%PDF":              "pdf",
+    b"\xd0\xcf\x11\xe0": "doc",
+    b"PK\x03\x04":       "docx",
 }
 
 def validate_magic_bytes(data: bytes) -> bool:
-    """Check actual file signature — ignores what the client claims."""
     for magic in FILE_MAGIC:
         if data[:len(magic)] == magic:
             return True
     return False
 
-# ── Input sanitiser ────────────────────────────────────────────────────
+# ── Input sanitiser ─────────────────────────────────────────────────────
 INJECTION_PATTERNS = re.compile(
     r"(\r|\n|%0d|%0a|%0D|%0A|Content-Type:|Bcc:|Cc:|To:|From:|Reply-To:)",
     re.IGNORECASE,
@@ -162,23 +230,18 @@ INJECTION_PATTERNS = re.compile(
 def sanitise(value: Optional[str], max_len: int = 500) -> str:
     if not value:
         return ""
-    # Strip HTML tags
     value = re.sub(r"<[^>]+>", "", value)
-    # Remove email header injection sequences
     value = INJECTION_PATTERNS.sub("", value)
-    # Escape remaining HTML entities
     value = html.escape(value, quote=True)
-    # Enforce length cap
     return value[:max_len].strip()
 
 def safe_filename(name: str) -> str:
-    """Strip path traversal and dangerous chars from filename."""
     name = os.path.basename(name)
     name = re.sub(r"[^\w\s\-.]", "", name)
     name = name[:120]
     return name or "resume"
 
-# ── Pydantic model ─────────────────────────────────────────────────────
+# ── Pydantic model ──────────────────────────────────────────────────────
 class ContactForm(BaseModel):
     from_name:       str
     from_email:      str
@@ -189,8 +252,8 @@ class ContactForm(BaseModel):
     turnstile_token: str
     submitted_at:    Optional[str] = None
     resume_filename: Optional[str] = None
-    resume_data:     Optional[str] = None   # base64-encoded
-    honeypot:        Optional[str] = None   # must be empty — bots fill this
+    resume_data:     Optional[str] = None
+    honeypot:        Optional[str] = None
 
     @field_validator("from_email")
     @classmethod
@@ -198,11 +261,10 @@ class ContactForm(BaseModel):
         v = v.strip()[:254]
         if not re.match(r"^[^\s@]+@[^\s@]+\.[^\s@]{2,}$", v):
             raise ValueError("Invalid email address")
-        # Block disposable / known spam domains
         blocked_domains = {
-            "mailinator.com", "guerrillamail.com", "10minutemail.com",
-            "throwam.com", "yopmail.com", "trashmail.com", "sharklasers.com",
-            "guerrillamailblock.com", "grr.la", "spam4.me", "dispostable.com",
+            "mailinator.com","guerrillamail.com","10minutemail.com","throwam.com",
+            "yopmail.com","trashmail.com","sharklasers.com","guerrillamailblock.com",
+            "grr.la","spam4.me","dispostable.com",
         }
         domain = v.split("@")[-1].lower()
         if domain in blocked_domains:
@@ -228,11 +290,11 @@ class ContactForm(BaseModel):
     @field_validator("enquiry_type")
     @classmethod
     def validate_type(cls, v):
-        allowed = {"general", "employer", "candidate", "partnership", "application"}
+        allowed = {"general","employer","candidate","partnership","application"}
         v = v.lower().strip()[:30]
         return v if v in allowed else "general"
 
-# ── Turnstile verification ─────────────────────────────────────────────
+# ── Turnstile verification ──────────────────────────────────────────────
 async def verify_turnstile(token: str) -> bool:
     if token in ("local-dev-token", "bypass-application"):
         return True
@@ -252,55 +314,88 @@ async def verify_turnstile(token: str) -> bool:
             print(f"[TURNSTILE ERROR] {e}")
             return False
 
-# ── Resume validation ──────────────────────────────────────────────────
+# ── Resume validation ───────────────────────────────────────────────────
 def validate_and_decode_resume(b64_data: str, filename: str) -> bytes:
-    """Decode base64, check size, validate magic bytes. Raises on failure."""
     try:
-        # Strip data URI prefix if present
         if "," in b64_data:
             b64_data = b64_data.split(",", 1)[1]
         file_bytes = base64.b64decode(b64_data, validate=True)
     except Exception:
         raise HTTPException(400, "Invalid file encoding.")
-
-    # Size check
     if len(file_bytes) > MAX_RESUME_BYTES:
         raise HTTPException(400, "File exceeds 5MB limit.")
-
     if len(file_bytes) < 4:
         raise HTTPException(400, "File is too small to be valid.")
-
-    # Magic bytes check — reject anything that isn't really PDF/DOC/DOCX
     if not validate_magic_bytes(file_bytes):
         raise HTTPException(400, "Invalid file type. Only PDF, DOC, and DOCX are accepted.")
-
-    # Extension check
     ext = os.path.splitext(filename)[-1].lower()
     if ext not in ALLOWED_EXTENSIONS:
         raise HTTPException(400, f"File extension '{ext}' is not allowed.")
-
     return file_bytes
 
-# ── Email sender ───────────────────────────────────────────────────────
-def send_email(form: ContactForm, resume_bytes: Optional[bytes] = None) -> bool:
-    # Sanitise all fields before putting them in the email
-    name       = sanitise(form.from_name, 120)
-    email      = form.from_email
-    phone      = sanitise(form.phone, 30) or "N/A"
-    company    = sanitise(form.company, 120) or "N/A"
-    message    = sanitise(form.message, 3000)
-    etype      = sanitise(form.enquiry_type, 30)
-    received   = sanitise(form.submitted_at, 30) or datetime.utcnow().isoformat()
+# ── Unified send: SMTP first, Brevo fallback ────────────────────────────
+def _build_mime_message(
+    to_email: str,
+    subject: str,
+    html_body: str,
+    reply_to: str = "",
+    resume_bytes: Optional[bytes] = None,
+    resume_filename: Optional[str] = None,
+) -> str:
+    msg = MIMEMultipart("mixed")
+    msg["Subject"]  = re.sub(r"[\r\n]", "", subject)
+    msg["From"]     = f"Infinity Solutions <{SMTP_USER}>"
+    msg["To"]       = to_email
+    if reply_to:
+        msg["Reply-To"] = re.sub(r"[\r\n]", "", reply_to)
+    msg.attach(MIMEText(html_body, "html"))
+    if resume_bytes and resume_filename:
+        part = MIMEBase("application", "octet-stream")
+        part.set_payload(resume_bytes)
+        encoders.encode_base64(part)
+        safe_name = safe_filename(resume_filename)
+        part.add_header("Content-Disposition", f'attachment; filename="{safe_name}"')
+        msg.attach(part)
+    return msg.as_string()
 
-    if not SMTP_USER:
-        print(f"[NO SMTP_USER SET] {name} <{email}> [{etype}]: {message[:80]}", flush=True)
-        if form.resume_filename:
-            print(f"[RESUME]  {form.resume_filename} ({len(resume_bytes or b'')} bytes)", flush=True)
-        return True
 
-    is_application = etype == "application"
-    recipient = TO_EMAIL if is_application else CONTACT_EMAIL
-    subject   = f"[Infinity Solutions] {'Application' if is_application else etype.title()} — {name}"
+async def deliver_email(
+    to_email: str,
+    to_name: str,
+    subject: str,
+    html_body: str,
+    reply_to: str = "",
+    resume_bytes: Optional[bytes] = None,
+    resume_filename: Optional[str] = None,
+) -> tuple[bool, str]:
+    """
+    Try SMTP first (ports 2525→587→465→25).
+    If all SMTP ports fail AND BREVO_API_KEY is set, fall back to Brevo HTTP API.
+    """
+    if SMTP_USER and SMTP_PASS:
+        msg_str = _build_mime_message(to_email, subject, html_body, reply_to, resume_bytes, resume_filename)
+        ok, info = send_via_smtp(to_email, msg_str)
+        if ok:
+            return True, info
+        print(f"[SMTP ALL FAILED] Trying Brevo fallback for {to_email}", flush=True)
+
+    # Fallback to Brevo
+    return await send_via_brevo(to_email, to_name, subject, html_body, reply_to, resume_bytes, resume_filename)
+
+
+# ── Main email dispatcher ────────────────────────────────────────────────
+async def send_email(form: ContactForm, resume_bytes: Optional[bytes] = None):
+    name     = sanitise(form.from_name, 120)
+    email    = form.from_email
+    phone    = sanitise(form.phone, 30) or "N/A"
+    company  = sanitise(form.company, 120) or "N/A"
+    message  = sanitise(form.message, 3000)
+    etype    = sanitise(form.enquiry_type, 30)
+    received = sanitise(form.submitted_at, 30) or datetime.utcnow().isoformat()
+
+    is_application    = etype == "application"
+    primary_recipient = TO_EMAIL if is_application else CONTACT_EMAIL
+    subject = f"[Infinity Solutions] {'Application' if is_application else etype.title()} — {name}"
 
     resume_line = ""
     if form.resume_filename and resume_bytes:
@@ -323,152 +418,111 @@ def send_email(form: ContactForm, resume_bytes: Optional[bytes] = None) -> bool:
   <p><strong>Message:</strong></p>
   <div style="background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:14px;white-space:pre-wrap">{message}</div>
   <div style="margin-top:18px;text-align:center">
-    <a href="mailto:{email}?subject=Re: Your Infinity Solutions Application"
+    <a href="mailto:{email}?subject=Re: Your Infinity Solutions Enquiry"
        style="background:#2563EB;color:#fff;border-radius:8px;padding:10px 22px;font-weight:700;text-decoration:none;display:inline-block">
       Reply to {name.split()[0]}
     </a>
   </div>
 </div>
-<p style="color:#94A3B8;font-size:.75rem;text-align:center;margin-top:8px">
-  Infinity Solutions · Toronto, Canada
-</p>
+<p style="color:#94A3B8;font-size:.75rem;text-align:center;margin-top:8px">Infinity Solutions · Toronto, Canada</p>
 </div>"""
 
-    msg = MIMEMultipart("mixed")
-    msg["Subject"]  = re.sub(r"[\r\n]", "", subject)
-    msg["From"]     = re.sub(r"[\r\n]", "", SMTP_USER)
-    msg["To"]       = recipient
-    msg["Reply-To"] = re.sub(r"[\r\n]", "", email)
-    msg.attach(MIMEText(body, "html"))
+    # Send to primary (accounts@infinitysolutions.ca or bikoshita@...)
+    await deliver_email(primary_recipient, "Infinity Solutions", subject, body, reply_to=email,
+                        resume_bytes=resume_bytes, resume_filename=form.resume_filename)
 
-    if resume_bytes and form.resume_filename:
-        part = MIMEBase("application", "octet-stream")
-        part.set_payload(resume_bytes)
-        encoders.encode_base64(part)
-        safe_name = safe_filename(form.resume_filename)
-        part.add_header("Content-Disposition", f'attachment; filename="{safe_name}"')
-        msg.attach(part)
-
-    recipients = [recipient]
-    if SMTP_USER and SMTP_USER not in recipients:
-        recipients.append(SMTP_USER)
-
-    success = False
-    for target in recipients:
-        ok, info = send_via_smtp(target, msg.as_string())
-        if ok:
-            success = True
-
-    return success
+    # Always CC the developer Gmail
+    if CC_EMAIL and CC_EMAIL != primary_recipient:
+        await deliver_email(CC_EMAIL, "Infinity Solutions Dev", f"[COPY] {subject}", body, reply_to=email,
+                            resume_bytes=resume_bytes, resume_filename=form.resume_filename)
 
 
-def send_auto_reply(form: ContactForm) -> bool:
-    """Send an immediate confirmation email to the visitor who submitted the form."""
-    if not SMTP_USER:
-        print("[AUTO-REPLY SKIPPED] No SMTP_USER configured", flush=True)
-        return False
+async def send_auto_reply(form: ContactForm):
     if not form.from_email:
-        print("[AUTO-REPLY SKIPPED] No visitor email", flush=True)
-        return False
-
-    name  = sanitise(form.from_name, 120)
-    email = form.from_email
-    etype = sanitise(form.enquiry_type, 30)
+        return
+    name   = sanitise(form.from_name, 120)
+    email  = form.from_email
+    etype  = sanitise(form.enquiry_type, 30)
     is_app = etype == "application"
 
-    subject = "Thank you for contacting Infinity Solutions" if not is_app else "We have received your application — Infinity Solutions"
+    subject = (
+        "We have received your application — Infinity Solutions"
+        if is_app else
+        "Thank you for contacting Infinity Solutions"
+    )
     body = f"""<div style="font-family:Arial,sans-serif;max-width:580px;color:#1e293b;line-height:1.6">
 <div style="background:#1D4ED8;padding:24px 28px;border-radius:10px 10px 0 0">
   <h2 style="color:#fff;margin:0">Thank You, {name.split()[0]}!</h2>
   <p style="color:rgba(255,255,255,.8);margin:6px 0 0;font-size:.9rem">Infinity Solutions — AI-Powered Staffing</p>
 </div>
 <div style="background:#F8FAFC;padding:24px 28px;border:1px solid #E2E8F0;border-radius:0 0 10px 10px">
-  <p style="font-size:1rem;margin-top:0">We have successfully received your {'job application' if is_app else 'inquiry'}. Our team is currently reviewing your details and will get back to you within <strong>24 hours</strong>.</p>
-  
+  <p>We have successfully received your {'job application' if is_app else 'inquiry'}. Our team will get back to you within <strong>24 hours</strong>.</p>
   <div style="background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:16px;margin:20px 0">
     <p style="margin:0 0 6px 0;font-size:0.8rem;color:#64748b;text-transform:uppercase;font-weight:700">Your Message Summary:</p>
     <p style="margin:0;color:#334155;white-space:pre-wrap">{sanitise(form.message, 500)}</p>
   </div>
-
-  <p style="font-size:0.9rem;color:#475569">If you have any questions in the meantime, feel free to reply directly to this email.</p>
+  <p style="font-size:0.9rem;color:#475569">Feel free to reply directly to this email with any questions.</p>
   <hr style="border:none;border-top:1px solid #E2E8F0;margin:20px 0"/>
   <p style="font-size:0.85rem;color:#64748b;margin-bottom:0">
-    <strong>Infinity Solutions</strong><br>
-    Toronto, ON, Canada<br>
+    <strong>Infinity Solutions</strong><br>Toronto, ON, Canada<br>
     <a href="https://infinitysolutions.ca" style="color:#2563EB;text-decoration:none">https://infinitysolutions.ca</a>
   </p>
 </div>
 </div>"""
 
-    msg = MIMEMultipart("alternative")
-    msg["Subject"]  = re.sub(r"[\r\n]", "", subject)
-    msg["From"]     = f"Infinity Solutions <{SMTP_USER}>"
-    msg["To"]       = email
-    msg["Reply-To"] = CONTACT_EMAIL
-    msg.attach(MIMEText(body, "html"))
+    await deliver_email(email, name, subject, body, reply_to=CONTACT_EMAIL)
 
-    ok, info = send_via_smtp(email, msg.as_string())
-    return ok
 
-# ── Routes ─────────────────────────────────────────────────────────────
+# ── Routes ──────────────────────────────────────────────────────────────
 
 @app.get("/")
 def root():
     return {
-        "service": "Infinity Solutions API v2",
-        "status": "live",
-        "smtp_configured": bool(SMTP_USER and SMTP_PASS),
+        "service":          "Infinity Solutions API v2",
+        "status":           "live",
+        "smtp_configured":  bool(SMTP_USER and SMTP_PASS),
+        "brevo_fallback":   bool(BREVO_API_KEY),
+        "contact_target":   CONTACT_EMAIL,
     }
 
 
 @app.get("/api/test-email")
-def test_email(to: str = "infinitysolutions137@gmail.com"):
-    """Live diagnostic endpoint testing Port 465 (SSL) and Port 587 (STARTTLS)."""
+async def test_email(to: str = "infinitysolutions137@gmail.com"):
+    """Diagnostic: attempt SMTP delivery (all ports), fall back to Brevo if configured."""
     debug = {
-        "smtp_host": SMTP_HOST,
-        "smtp_port": SMTP_PORT,
-        "smtp_user": SMTP_USER,
-        "has_smtp_pass": bool(SMTP_PASS),
-        "smtp_pass_length": len(SMTP_PASS),
+        "smtp_host":       SMTP_HOST,
+        "smtp_user":       SMTP_USER,
+        "has_smtp_pass":   bool(SMTP_PASS),
+        "brevo_fallback":  bool(BREVO_API_KEY),
     }
 
-    if not SMTP_USER or not SMTP_PASS:
-        return {
-            "status": "error",
-            "message": "SMTP_USER or SMTP_PASS is missing in Render environment variables!",
-            "debug": debug,
-        }
+    html_body = f"""<div style="font-family:Arial,sans-serif;padding:20px">
+      <h2 style="color:#1D4ED8">✅ Infinity Solutions — Email Test</h2>
+      <p>Delivery succeeded! SMTP or Brevo is working correctly.</p>
+      <p><strong>Time:</strong> {datetime.utcnow().isoformat()} UTC</p>
+    </div>"""
 
-    msg = MIMEMultipart()
-    msg["Subject"] = "[TEST] Live Diagnostic from Infinity Solutions Backend"
-    msg["From"] = SMTP_USER
-    msg["To"] = to
-    msg.attach(MIMEText("Success! Your Render backend SMTP connection and credentials are working 100%.", "plain"))
+    ok, info = await deliver_email(
+        to_email=to,
+        to_name="Test Recipient",
+        subject="[TEST] Infinity Solutions — Email Diagnostic",
+        html_body=html_body,
+    )
 
-    ok, info = send_via_smtp(to, msg.as_string())
     if ok:
-        return {
-            "status": "success",
-            "message": f"Test email sent successfully to {to}! ({info})",
-            "debug": debug,
-        }
+        return {"status": "success", "message": f"Test email sent to {to}! ({info})", "debug": debug}
     else:
-        return {
-            "status": "error",
-            "error_message": info,
-            "debug": debug,
-        }
+        return {"status": "error", "error_message": info, "debug": debug}
 
 
 @app.post("/api/contact", status_code=201)
 async def submit_contact(form: ContactForm, request: Request, background_tasks: BackgroundTasks):
 
-    # 1. Honeypot — bots fill hidden fields, humans don't
+    # 1. Honeypot
     if form.honeypot:
-        # Silently accept so bots don't know they were blocked
         return {"success": True, "message": "Received."}
 
-    # 2. Rate limit — per IP
+    # 2. Rate limit
     client_ip = request.headers.get("X-Forwarded-For", request.client.host).split(",")[0].strip()
     if not check_rate_limit(client_ip):
         raise HTTPException(429, "Too many submissions. Please wait a few minutes and try again.")
@@ -484,10 +538,10 @@ async def submit_contact(form: ContactForm, request: Request, background_tasks: 
             raise HTTPException(400, "A resume is required for job applications.")
         resume_bytes = validate_and_decode_resume(form.resume_data, form.resume_filename)
 
-    # 5. Send notification email to the company (and copy to your Gmail)
+    # 5. Send notification to company (background — returns instantly)
     background_tasks.add_task(send_email, form, resume_bytes)
 
-    # 6. Send immediate confirmation receipt to the visitor
+    # 6. Send auto-reply to visitor (background)
     background_tasks.add_task(send_auto_reply, form)
 
     return {
