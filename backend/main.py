@@ -43,6 +43,53 @@ class IPv4SMTP(smtplib.SMTP):
             raise err
         raise OSError("getaddrinfo returned empty IPv4 list")
 
+
+class IPv4SMTP_SSL(smtplib.SMTP_SSL):
+    """Force IPv4 connection over SSL (port 465)."""
+    def _get_socket(self, host, port, timeout):
+        err = None
+        for res in socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM):
+            af, socktype, proto, canonname, sa = res
+            sock = None
+            try:
+                sock = socket.socket(af, socktype, proto)
+                if timeout is not None:
+                    sock.settimeout(timeout)
+                sock.connect(sa)
+                return self.context.wrap_socket(sock, server_hostname=host)
+            except OSError as _err:
+                err = _err
+                if sock is not None:
+                    sock.close()
+        if err is not None:
+            raise err
+        raise OSError("getaddrinfo returned empty IPv4 list")
+
+
+def send_via_smtp(recipient: str, msg_str: str) -> tuple[bool, str]:
+    """Attempt sending via port 465 (SSL) first, falling back to 587 (STARTTLS)."""
+    ports = [465, 587]
+    errors = []
+    for p in ports:
+        try:
+            if p == 465:
+                with IPv4SMTP_SSL(SMTP_HOST, 465, timeout=10) as s:
+                    s.login(SMTP_USER, SMTP_PASS)
+                    s.sendmail(SMTP_USER, [recipient], msg_str)
+            else:
+                with IPv4SMTP(SMTP_HOST, 587, timeout=10) as s:
+                    s.ehlo()
+                    s.starttls()
+                    s.login(SMTP_USER, SMTP_PASS)
+                    s.sendmail(SMTP_USER, [recipient], msg_str)
+            print(f"[EMAIL SUCCESS] Delivered to {recipient} via port {p}", flush=True)
+            return True, f"Delivered via port {p}"
+        except Exception as e:
+            err_msg = f"Port {p} failed: {type(e).__name__} ({e})"
+            errors.append(err_msg)
+            print(f"[SMTP FAIL] {recipient} on {err_msg}", flush=True)
+    return False, " | ".join(errors)
+
 # ── Config ────────────────────────────────────────────────────────────
 ALLOWED_ORIGINS   = os.getenv(
     "ALLOWED_ORIGINS",
@@ -308,16 +355,9 @@ def send_email(form: ContactForm, resume_bytes: Optional[bytes] = None) -> bool:
 
     success = False
     for target in recipients:
-        try:
-            with IPv4SMTP(SMTP_HOST, SMTP_PORT, timeout=15) as s:
-                s.ehlo()
-                s.starttls()
-                s.login(SMTP_USER, SMTP_PASS)
-                s.sendmail(SMTP_USER, [target], msg.as_string())
-            print(f"[EMAIL SUCCESS] Delivered notification to {target}", flush=True)
+        ok, info = send_via_smtp(target, msg.as_string())
+        if ok:
             success = True
-        except Exception as e:
-            print(f"[EMAIL ERROR for {target}] {e}", flush=True)
 
     return success
 
@@ -367,17 +407,8 @@ def send_auto_reply(form: ContactForm) -> bool:
     msg["Reply-To"] = CONTACT_EMAIL
     msg.attach(MIMEText(body, "html"))
 
-    try:
-        with IPv4SMTP(SMTP_HOST, SMTP_PORT, timeout=15) as s:
-            s.ehlo()
-            s.starttls()
-            s.login(SMTP_USER, SMTP_PASS)
-            s.sendmail(SMTP_USER, [email], msg.as_string())
-        print(f"[AUTO-REPLY SUCCESS] Confirmation sent to visitor: {email}", flush=True)
-        return True
-    except Exception as e:
-        print(f"[AUTO-REPLY ERROR for {email}] {e}", flush=True)
-        return False
+    ok, info = send_via_smtp(email, msg.as_string())
+    return ok
 
 # ── Routes ─────────────────────────────────────────────────────────────
 
@@ -392,7 +423,7 @@ def root():
 
 @app.get("/api/test-email")
 def test_email(to: str = "infinitysolutions137@gmail.com"):
-    """Live diagnostic endpoint to test email delivery directly from your browser."""
+    """Live diagnostic endpoint testing Port 465 (SSL) and Port 587 (STARTTLS)."""
     debug = {
         "smtp_host": SMTP_HOST,
         "smtp_port": SMTP_PORT,
@@ -408,30 +439,23 @@ def test_email(to: str = "infinitysolutions137@gmail.com"):
             "debug": debug,
         }
 
-    try:
-        with IPv4SMTP(SMTP_HOST, SMTP_PORT, timeout=15) as s:
-            s.ehlo()
-            s.starttls()
-            s.login(SMTP_USER, SMTP_PASS)
-            msg = MIMEMultipart()
-            msg["Subject"] = "[TEST] Live Diagnostic from Infinity Solutions Backend"
-            msg["From"] = SMTP_USER
-            msg["To"] = to
-            msg.attach(MIMEText("Success! Your Render backend SMTP connection and credentials are working 100%.", "plain"))
-            s.sendmail(SMTP_USER, [to], msg.as_string())
+    msg = MIMEMultipart()
+    msg["Subject"] = "[TEST] Live Diagnostic from Infinity Solutions Backend"
+    msg["From"] = SMTP_USER
+    msg["To"] = to
+    msg.attach(MIMEText("Success! Your Render backend SMTP connection and credentials are working 100%.", "plain"))
 
+    ok, info = send_via_smtp(to, msg.as_string())
+    if ok:
         return {
             "status": "success",
-            "message": f"Test email sent successfully to {to}! Check your inbox.",
+            "message": f"Test email sent successfully to {to}! ({info})",
             "debug": debug,
         }
-    except Exception as e:
-        import traceback
+    else:
         return {
             "status": "error",
-            "error_type": type(e).__name__,
-            "error_message": str(e),
-            "traceback": traceback.format_exc(),
+            "error_message": info,
             "debug": debug,
         }
 
