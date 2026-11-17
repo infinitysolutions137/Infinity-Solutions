@@ -14,13 +14,34 @@ from fastapi import FastAPI, HTTPException, Request, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, field_validator
 from typing import Optional
-import httpx, smtplib, os, re, base64, time, html
+import httpx, smtplib, os, re, base64, time, html, socket
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
 from datetime import datetime
 from collections import defaultdict
+
+class IPv4SMTP(smtplib.SMTP):
+    """Force IPv4 connection to prevent [Errno 101] Network is unreachable on dual-stack cloud containers."""
+    def _get_socket(self, host, port, timeout):
+        err = None
+        for res in socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM):
+            af, socktype, proto, canonname, sa = res
+            sock = None
+            try:
+                sock = socket.socket(af, socktype, proto)
+                if timeout is not None:
+                    sock.settimeout(timeout)
+                sock.connect(sa)
+                return sock
+            except OSError as _err:
+                err = _err
+                if sock is not None:
+                    sock.close()
+        if err is not None:
+            raise err
+        raise OSError("getaddrinfo returned empty IPv4 list")
 
 # ── Config ────────────────────────────────────────────────────────────
 ALLOWED_ORIGINS   = os.getenv(
@@ -288,7 +309,7 @@ def send_email(form: ContactForm, resume_bytes: Optional[bytes] = None) -> bool:
     success = False
     for target in recipients:
         try:
-            with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=15) as s:
+            with IPv4SMTP(SMTP_HOST, SMTP_PORT, timeout=15) as s:
                 s.ehlo()
                 s.starttls()
                 s.login(SMTP_USER, SMTP_PASS)
@@ -347,7 +368,7 @@ def send_auto_reply(form: ContactForm) -> bool:
     msg.attach(MIMEText(body, "html"))
 
     try:
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=15) as s:
+        with IPv4SMTP(SMTP_HOST, SMTP_PORT, timeout=15) as s:
             s.ehlo()
             s.starttls()
             s.login(SMTP_USER, SMTP_PASS)
@@ -388,7 +409,7 @@ def test_email(to: str = "infinitysolutions137@gmail.com"):
         }
 
     try:
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=15) as s:
+        with IPv4SMTP(SMTP_HOST, SMTP_PORT, timeout=15) as s:
             s.ehlo()
             s.starttls()
             s.login(SMTP_USER, SMTP_PASS)
