@@ -375,7 +375,13 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
         sent = true;
       } else {
         const errJson = await res.json().catch(() => ({}));
-        errorMessage = errJson.detail || 'Server rejected submission. Please try again.';
+        if (Array.isArray(errJson.detail)) {
+          errorMessage = errJson.detail.map(d => d.msg.replace(/^Value error,\s*/i, '')).join(', ');
+        } else if (typeof errJson.detail === 'string') {
+          errorMessage = errJson.detail;
+        } else {
+          errorMessage = 'Server rejected submission. Please check all fields.';
+        }
         console.error('Backend error:', res.status, errJson);
       }
     } catch (netErr) {

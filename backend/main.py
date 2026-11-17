@@ -166,16 +166,16 @@ class ContactForm(BaseModel):
     @classmethod
     def validate_name(cls, v):
         v = sanitise(v, 120)
-        if len(v) < 2:
-            raise ValueError("Name is too short")
+        if len(v) < 1:
+            raise ValueError("Name cannot be empty")
         return v
 
     @field_validator("message")
     @classmethod
     def validate_message(cls, v):
         v = sanitise(v, 3000)
-        if len(v) < 5:
-            raise ValueError("Message is too short")
+        if len(v) < 1:
+            raise ValueError("Message cannot be empty")
         return v
 
     @field_validator("enquiry_type")
