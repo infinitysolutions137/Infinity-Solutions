@@ -225,9 +225,9 @@ def send_email(form: ContactForm, resume_bytes: Optional[bytes] = None) -> bool:
     received   = sanitise(form.submitted_at, 30) or datetime.utcnow().isoformat()
 
     if not SMTP_USER:
-        print(f"[CONTACT] {name} <{email}> [{etype}]: {message[:80]}")
+        print(f"[NO SMTP_USER SET] {name} <{email}> [{etype}]: {message[:80]}", flush=True)
         if form.resume_filename:
-            print(f"[RESUME]  {form.resume_filename} ({len(resume_bytes or b'')} bytes)")
+            print(f"[RESUME]  {form.resume_filename} ({len(resume_bytes or b'')} bytes)", flush=True)
         return True
 
     is_application = etype == "application"
@@ -267,7 +267,6 @@ def send_email(form: ContactForm, resume_bytes: Optional[bytes] = None) -> bool:
 </div>"""
 
     msg = MIMEMultipart("mixed")
-    # Prevent header injection — strip newlines from subject/from
     msg["Subject"]  = re.sub(r"[\r\n]", "", subject)
     msg["From"]     = re.sub(r"[\r\n]", "", SMTP_USER)
     msg["To"]       = recipient
@@ -286,21 +285,29 @@ def send_email(form: ContactForm, resume_bytes: Optional[bytes] = None) -> bool:
     if SMTP_USER and SMTP_USER not in recipients:
         recipients.append(SMTP_USER)
 
-    try:
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=15) as s:
-            s.ehlo()
-            s.starttls()
-            s.login(SMTP_USER, SMTP_PASS)
-            s.sendmail(SMTP_USER, recipients, msg.as_string())
-        return True
-    except Exception as e:
-        print(f"[EMAIL ERROR] {e}")
-        return False
+    success = False
+    for target in recipients:
+        try:
+            with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=15) as s:
+                s.ehlo()
+                s.starttls()
+                s.login(SMTP_USER, SMTP_PASS)
+                s.sendmail(SMTP_USER, [target], msg.as_string())
+            print(f"[EMAIL SUCCESS] Delivered notification to {target}", flush=True)
+            success = True
+        except Exception as e:
+            print(f"[EMAIL ERROR for {target}] {e}", flush=True)
+
+    return success
 
 
 def send_auto_reply(form: ContactForm) -> bool:
     """Send an immediate confirmation email to the visitor who submitted the form."""
-    if not SMTP_USER or not form.from_email:
+    if not SMTP_USER:
+        print("[AUTO-REPLY SKIPPED] No SMTP_USER configured", flush=True)
+        return False
+    if not form.from_email:
+        print("[AUTO-REPLY SKIPPED] No visitor email", flush=True)
         return False
 
     name  = sanitise(form.from_name, 120)
@@ -344,17 +351,68 @@ def send_auto_reply(form: ContactForm) -> bool:
             s.ehlo()
             s.starttls()
             s.login(SMTP_USER, SMTP_PASS)
-            s.sendmail(SMTP_USER, email, msg.as_string())
+            s.sendmail(SMTP_USER, [email], msg.as_string())
+        print(f"[AUTO-REPLY SUCCESS] Confirmation sent to visitor: {email}", flush=True)
         return True
     except Exception as e:
-        print(f"[AUTO-REPLY ERROR] {e}")
+        print(f"[AUTO-REPLY ERROR for {email}] {e}", flush=True)
         return False
 
 # ── Routes ─────────────────────────────────────────────────────────────
 
 @app.get("/")
 def root():
-    return {"service": "Infinity Solutions API v2", "status": "live"}
+    return {
+        "service": "Infinity Solutions API v2",
+        "status": "live",
+        "smtp_configured": bool(SMTP_USER and SMTP_PASS),
+    }
+
+
+@app.get("/api/test-email")
+def test_email(to: str = "infinitysolutions137@gmail.com"):
+    """Live diagnostic endpoint to test email delivery directly from your browser."""
+    debug = {
+        "smtp_host": SMTP_HOST,
+        "smtp_port": SMTP_PORT,
+        "smtp_user": SMTP_USER,
+        "has_smtp_pass": bool(SMTP_PASS),
+        "smtp_pass_length": len(SMTP_PASS),
+    }
+
+    if not SMTP_USER or not SMTP_PASS:
+        return {
+            "status": "error",
+            "message": "SMTP_USER or SMTP_PASS is missing in Render environment variables!",
+            "debug": debug,
+        }
+
+    try:
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=15) as s:
+            s.ehlo()
+            s.starttls()
+            s.login(SMTP_USER, SMTP_PASS)
+            msg = MIMEMultipart()
+            msg["Subject"] = "[TEST] Live Diagnostic from Infinity Solutions Backend"
+            msg["From"] = SMTP_USER
+            msg["To"] = to
+            msg.attach(MIMEText("Success! Your Render backend SMTP connection and credentials are working 100%.", "plain"))
+            s.sendmail(SMTP_USER, [to], msg.as_string())
+
+        return {
+            "status": "success",
+            "message": f"Test email sent successfully to {to}! Check your inbox.",
+            "debug": debug,
+        }
+    except Exception as e:
+        import traceback
+        return {
+            "status": "error",
+            "error_type": type(e).__name__,
+            "error_message": str(e),
+            "traceback": traceback.format_exc(),
+            "debug": debug,
+        }
 
 
 @app.post("/api/contact", status_code=201)
