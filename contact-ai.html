@@ -358,32 +358,40 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
 
     /* Try live backend */
     let sent = false;
+    let errorMessage = '';
+
     try {
       const apiEndpoint = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
         ? 'http://localhost:8000/api/contact'
         : 'https://infinity-solutions-api.onrender.com/api/contact';
+
       const res = await fetch(apiEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
+
       if (res.ok) {
         sent = true;
       } else {
         const errJson = await res.json().catch(() => ({}));
-        console.warn('Backend responded with status:', res.status, errJson);
+        errorMessage = errJson.detail || 'Server rejected submission. Please try again.';
+        console.error('Backend error:', res.status, errJson);
       }
-    } catch {}
-
-    /* Static-site fallback: use mailto as last resort */
-    if (!sent) {
-      /* Simulate slight delay for UX */
-      await new Promise(r => setTimeout(r, 900));
+    } catch (netErr) {
+      console.error('Network/CORS fetch error:', netErr);
+      errorMessage = 'Could not reach the server. If it was idle, please wait 30 seconds and try again.';
     }
 
-    /* Show success */
-    document.getElementById('formWrap').style.display = 'none';
-    document.getElementById('formSuccess').style.display = 'block';
+    if (sent) {
+      document.getElementById('formWrap').style.display = 'none';
+      document.getElementById('formSuccess').style.display = 'block';
+    } else {
+      errBox.textContent = errorMessage || 'Something went wrong. Please try again.';
+      errBox.style.display = 'block';
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '✦ &nbsp;Send Message →';
+    }
 
   } catch (err) {
     errBox.textContent = 'Something went wrong. Please try again.';

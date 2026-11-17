@@ -23,7 +23,10 @@ from datetime import datetime
 from collections import defaultdict
 
 # ── Config ────────────────────────────────────────────────────────────
-ALLOWED_ORIGINS   = os.getenv("ALLOWED_ORIGINS", "https://infinitysolutions.ca,http://localhost:3000,http://127.0.0.1:3000,http://localhost:8000,http://127.0.0.1:8000").split(",")
+ALLOWED_ORIGINS   = os.getenv(
+    "ALLOWED_ORIGINS",
+    "https://infinitysolutions.ca,https://www.infinitysolutions.ca,http://infinitysolutions.ca,http://www.infinitysolutions.ca,http://localhost:3000,http://127.0.0.1:3000,http://localhost:8000,http://127.0.0.1:8000"
+).split(",")
 TO_EMAIL          = os.getenv("TO_EMAIL", "bikoshita@infinitysolutions.ca")
 CONTACT_EMAIL     = os.getenv("CONTACT_EMAIL", "accounts@infinitysolutions.ca")
 SMTP_HOST         = os.getenv("SMTP_HOST", "smtp.gmail.com")
@@ -37,17 +40,17 @@ app = FastAPI(title="Infinity Solutions API v2", docs_url=None, redoc_url=None)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS,   # Only your domain — not "*"
-    allow_origin_regex=r"https://.*\.netlify\.app",  # Allow all Netlify deployments & previews
+    allow_origins=ALLOWED_ORIGINS,
+    allow_origin_regex=r"https?://(.*\.)?(infinitysolutions\.ca|netlify\.app)(:\d+)?$",
     allow_credentials=True,
-    allow_methods=["POST", "GET"],
-    allow_headers=["Content-Type"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # ── Rate limiter — in-memory, per IP ──────────────────────────────────
-# Allows 5 requests per IP per 10 minutes
+# Allows 30 requests per IP per 10 minutes (generous for testing)
 RATE_WINDOW   = 600   # seconds
-RATE_LIMIT    = 5
+RATE_LIMIT    = 30
 _rate_store: dict = defaultdict(list)
 
 def check_rate_limit(ip: str) -> bool:
