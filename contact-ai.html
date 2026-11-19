@@ -349,19 +349,14 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
 
   /* 1. Submit via Netlify Forms (Native, 100% reliable) */
   try {
-    const netlifyBody = new URLSearchParams();
-    netlifyBody.set('form-name', 'contact');
-    netlifyBody.set('name', name);
-    netlifyBody.set('email', email);
-    netlifyBody.set('phone', phone);
-    netlifyBody.set('company', company);
-    netlifyBody.set('enquiry_type', type);
-    netlifyBody.set('message', message);
+    const netlifyFormData = new FormData(e.target);
+    netlifyFormData.set('form-name', 'contact');
+    netlifyFormData.set('enquiry_type', type);
 
     const netlifyRes = await fetch('/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: netlifyBody.toString(),
+      body: new URLSearchParams(netlifyFormData).toString(),
     });
 
     if (netlifyRes.ok || netlifyRes.status === 200 || netlifyRes.status === 303) {
