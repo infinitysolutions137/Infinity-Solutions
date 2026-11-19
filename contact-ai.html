@@ -228,7 +228,7 @@ textarea.fi { resize: vertical; min-height: 100px; }
         <div class="err-box" id="errBox"></div>
 
         <!-- Form (Netlify Forms integrated) -->
-        <form id="contactForm" name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" novalidate>
+        <form id="contactForm" name="contact" method="POST" action="/contact-ai.html" data-netlify="true" netlify-honeypot="bot-field" novalidate>
           <!-- Netlify required hidden fields -->
           <input type="hidden" name="form-name" value="contact"/>
           <p style="display:none">
@@ -347,13 +347,14 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
 
   let sent = false;
 
-  /* 1. Submit via Netlify Forms (Native, 100% reliable) */
+  /* 1. Submit via Netlify Forms */
   try {
     const netlifyFormData = new FormData(e.target);
     netlifyFormData.set('form-name', 'contact');
     netlifyFormData.set('enquiry_type', type);
 
-    const netlifyRes = await fetch('/', {
+    const postPath = window.location.pathname.endsWith('.html') ? window.location.pathname : '/contact-ai.html';
+    const netlifyRes = await fetch(postPath, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams(netlifyFormData).toString(),
@@ -361,7 +362,17 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
 
     if (netlifyRes.ok || netlifyRes.status === 200 || netlifyRes.status === 303) {
       sent = true;
-      console.log('Netlify Form submitted successfully');
+      console.log('Netlify Form submitted to', postPath);
+    } else {
+      const rootRes = await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(netlifyFormData).toString(),
+      });
+      if (rootRes.ok || rootRes.status === 200 || rootRes.status === 303) {
+        sent = true;
+        console.log('Netlify Form submitted to /');
+      }
     }
   } catch (netErr) {
     console.warn('Netlify form submission error:', netErr);
