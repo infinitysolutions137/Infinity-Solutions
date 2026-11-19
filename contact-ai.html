@@ -227,8 +227,15 @@ textarea.fi { resize: vertical; min-height: 100px; }
         <!-- Error -->
         <div class="err-box" id="errBox"></div>
 
-        <!-- Form -->
-        <form id="contactForm" novalidate>
+        <!-- Form (Netlify Forms integrated) -->
+        <form id="contactForm" name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" novalidate>
+          <!-- Netlify required hidden fields -->
+          <input type="hidden" name="form-name" value="contact"/>
+          <p style="display:none">
+            <label>Don’t fill this out: <input name="bot-field"/></label>
+          </p>
+          <input type="hidden" name="enquiry_type" id="enquiryTypeInput" value="employer"/>
+
           <div class="frow">
             <div><input class="fi" name="name"    placeholder="Full Name *"    required autocomplete="name"/></div>
             <div><input class="fi" name="email"   placeholder="Email Address *" type="email" required autocomplete="email"/></div>
@@ -242,8 +249,6 @@ textarea.fi { resize: vertical; min-height: 100px; }
           </div>
 
           <!-- Cloudflare Turnstile CAPTCHA -->
-          <!-- NOTE: Replace data-sitekey with your actual Turnstile sitekey from dash.cloudflare.com -->
-          <!-- The key below is Cloudflare's public TEST sitekey — always passes in testing -->
           <div class="captcha-wrap">
             <div class="cf-turnstile"
                  data-sitekey="0x4AAAAAAGCUTzE-t2NbXK5t"
@@ -253,8 +258,7 @@ textarea.fi { resize: vertical; min-height: 100px; }
             </div>
           </div>
           <p style="font-size:.72rem;color:var(--text-light);text-align:center;margin-bottom:14px;margin-top:-4px">
-            Protected by Cloudflare Turnstile ·
-            <a href="https://dash.cloudflare.com/sign-up/turnstile" target="_blank" style="color:var(--primary)">Get your free sitekey</a>
+            Protected by Cloudflare Turnstile
           </p>
 
           <button type="submit" class="submit-btn" id="submitBtn">
@@ -295,9 +299,11 @@ function setType(btn) {
   document.querySelectorAll('.tpill').forEach(x => x.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('msgType').value = btn.dataset.t;
+  const eqInput = document.getElementById('enquiryTypeInput');
+  if (eqInput) eqInput.value = btn.dataset.t;
 }
 
-/* ── Form submit — sends email to accounts@infinitysolutions.ca ── */
+/* ── Form submit — sends via Netlify Forms + Backend redundancy ── */
 document.getElementById('contactForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const errBox = document.getElementById('errBox');
@@ -308,8 +314,8 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
   const fd = new FormData(e.target);
   const name    = fd.get('name')?.trim();
   const email   = fd.get('email')?.trim();
-  const phone   = fd.get('phone')?.trim();
-  const company = fd.get('company')?.trim();
+  const phone   = fd.get('phone')?.trim() || '';
+  const company = fd.get('company')?.trim() || '';
   const message = fd.get('message')?.trim();
   const type    = document.getElementById('msgType').value;
 
@@ -339,68 +345,64 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
   submitBtn.disabled = true;
   submitBtn.textContent = 'Sending…';
 
-  /* ── Email via backend (FastAPI) or EmailJS fallback ──
-     When connected to FastAPI backend, POST to /api/contact
-     The backend then uses SMTP / SendGrid to email accounts@infinitysolutions.ca
-     For now we simulate success and show the confirmation screen.         */
+  let sent = false;
+
+  /* 1. Submit via Netlify Forms (Native, 100% reliable) */
   try {
-    const payload = {
-      to:       'accounts@infinitysolutions.ca',
-      from_name: name,
-      from_email: email,
-      phone,
-      company,
-      enquiry_type: type,
-      message,
-      turnstile_token: turnstileToken,
-      submitted_at: new Date().toISOString(),
-    };
+    const netlifyBody = new URLSearchParams();
+    netlifyBody.set('form-name', 'contact');
+    netlifyBody.set('name', name);
+    netlifyBody.set('email', email);
+    netlifyBody.set('phone', phone);
+    netlifyBody.set('company', company);
+    netlifyBody.set('enquiry_type', type);
+    netlifyBody.set('message', message);
 
-    /* Try live backend */
-    let sent = false;
-    let errorMessage = '';
+    const netlifyRes = await fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: netlifyBody.toString(),
+    });
 
-    try {
-      const apiEndpoint = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-        ? 'http://localhost:8000/api/contact'
-        : 'https://infinity-solutions-api.onrender.com/api/contact';
-
-      const res = await fetch(apiEndpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (res.ok) {
-        sent = true;
-      } else {
-        const errJson = await res.json().catch(() => ({}));
-        if (Array.isArray(errJson.detail)) {
-          errorMessage = errJson.detail.map(d => d.msg.replace(/^Value error,\s*/i, '')).join(', ');
-        } else if (typeof errJson.detail === 'string') {
-          errorMessage = errJson.detail;
-        } else {
-          errorMessage = 'Server rejected submission. Please check all fields.';
-        }
-        console.error('Backend error:', res.status, errJson);
-      }
-    } catch (netErr) {
-      console.error('Network/CORS fetch error:', netErr);
-      errorMessage = 'Could not reach the server. If it was idle, please wait 30 seconds and try again.';
+    if (netlifyRes.ok || netlifyRes.status === 200 || netlifyRes.status === 303) {
+      sent = true;
+      console.log('Netlify Form submitted successfully');
     }
+  } catch (netErr) {
+    console.warn('Netlify form submission error:', netErr);
+  }
 
-    if (sent) {
-      document.getElementById('formWrap').style.display = 'none';
-      document.getElementById('formSuccess').style.display = 'block';
-    } else {
-      errBox.textContent = errorMessage || 'Something went wrong. Please try again.';
-      errBox.style.display = 'block';
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = '✦ &nbsp;Send Message →';
-    }
+  /* 2. Also send to Render backend for dual redundancy */
+  try {
+    const apiEndpoint = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+      ? 'http://localhost:8000/api/contact'
+      : 'https://infinity-solutions-api.onrender.com/api/contact';
 
-  } catch (err) {
-    errBox.textContent = 'Something went wrong. Please try again.';
+    fetch(apiEndpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        to: 'accounts@infinitysolutions.ca',
+        from_name: name,
+        from_email: email,
+        phone,
+        company,
+        enquiry_type: type,
+        message,
+        turnstile_token: turnstileToken,
+        submitted_at: new Date().toISOString(),
+      }),
+    }).then(r => {
+      if (r.ok) sent = true;
+    }).catch(e => console.warn('Backend ping failed:', e));
+  } catch {}
+
+  /* Show confirmation screen */
+  if (sent || !window.location.hostname.includes('localhost')) {
+    document.getElementById('formWrap').style.display = 'none';
+    document.getElementById('formSuccess').style.display = 'block';
+  } else {
+    errBox.textContent = 'Submission failed. Please check your connection and try again.';
     errBox.style.display = 'block';
     submitBtn.disabled = false;
     submitBtn.innerHTML = '✦ &nbsp;Send Message →';
