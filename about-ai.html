@@ -47,7 +47,7 @@
 .cta-band h2{font-size:2.4rem;font-weight:800;color:#fff;margin-bottom:12px;letter-spacing:-.02em}
 .cta-band p{color:rgba(255,255,255,.75);margin-bottom:28px}
 .cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
-@media(max-width:900px){.nav-center{display:none}.burger{display:flex!important}.about-hero,.mission-grid{grid-template-columns:1fr}.ah-right{min-height:280px;position:relative}.ah-right img{position:absolute;inset:0}.ai-steps,.vgrid{grid-template-columns:1fr 1fr}.stats-2x2{grid-template-columns:1fr 1fr}}
+@media(max-width:992px){.nav-center{display:none}.burger{display:flex!important}.about-hero,.mission-grid{grid-template-columns:1fr}.ah-right{min-height:280px;position:relative}.ah-right img{position:absolute;inset:0}.ai-steps,.vgrid{grid-template-columns:1fr 1fr}.stats-2x2{grid-template-columns:1fr 1fr}}
 @media(max-width:600px){.ah-left{padding:44px 20px}.ah-left h1{font-size:1.9rem}.mission-grid{gap:32px;padding:44px 0}.ai-steps,.vgrid,.stats-2x2{grid-template-columns:1fr}.cta-band{padding:56px 0}.cta-band h2{font-size:1.85rem}.cta-row{flex-direction:column;width:100%}.cta-row .btn{width:100%;justify-content:center}}
 </style>
 </head>
@@ -55,7 +55,7 @@
 <nav class="navbar" id="navbar">
   <a href="index.html" class="nav-logo"><div class="nav-logo-mark">IS</div> Infinity Solutions</a>
   <div class="nav-center"><ul class="nav-links"><li><a href="index.html">Home</a></li><li><a href="jobs.html">Jobs</a></li><li><a href="services-ai.html">Services</a></li><li><a href="about-ai.html" class="active">About</a></li><li><a href="contact-ai.html">Contact</a></li></ul></div>
-  <div class="nav-right"><div class="nav-ai-badge"><span class="nav-ai-dot"></span> AI-Powered</div><a href="contact-ai.html" class="btn btn-primary btn-sm">Hire Talent →</a><button class="burger" id="burger" style="display:none"><span></span><span></span><span></span></button></div>
+  <div class="nav-right"><div class="nav-ai-badge"><span class="nav-ai-dot"></span> AI-Powered</div><a href="contact-ai.html" class="btn btn-primary btn-sm">Hire Talent →</a><button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button></div>
 </nav>
 <div class="mobile-drawer" id="drawer">
   <a href="index.html">Home</a>
@@ -140,8 +140,8 @@ const nav=document.getElementById('navbar');
 window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>20),{passive:true});
 const b=document.getElementById('burger'),d=document.getElementById('drawer');
 if(b&&d){
-  b.style.display='';
-  b.addEventListener('click',()=>{
+  b.addEventListener('click',(e)=>{
+    e.stopPropagation();
     const isOpen=d.classList.toggle('open');
     b.classList.toggle('open',isOpen);
   });
@@ -149,6 +149,12 @@ if(b&&d){
     d.classList.remove('open');
     b.classList.remove('open');
   }));
+  document.addEventListener('click',(e)=>{
+    if(d.classList.contains('open')&&!d.contains(e.target)&&!b.contains(e.target)){
+      d.classList.remove('open');
+      b.classList.remove('open');
+    }
+  });
 }
 // Counter
 const counters=document.querySelectorAll('[data-count]');

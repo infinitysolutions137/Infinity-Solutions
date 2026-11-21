@@ -94,8 +94,8 @@ textarea.fi { resize: vertical; min-height: 100px; }
 .succ-box p { color: var(--text-mid); line-height: 1.7; }
 .succ-box .next-steps { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 24px; }
 
-@media (max-width: 960px) {
-  .nav-center { display: none; }
+@media (max-width: 992px) {
+  .nav-center, .nav-right .btn, .nav-ai-badge { display: none !important; }
   .burger { display: flex !important; }
   .contact-layout { grid-template-columns: 1fr; gap: 40px; padding: 40px 0 60px; }
   .frow { grid-template-columns: 1fr; }
@@ -134,7 +134,7 @@ textarea.fi { resize: vertical; min-height: 100px; }
   <div class="nav-right">
     <div class="nav-ai-badge"><span class="nav-ai-dot"></span> AI-Powered</div>
     <a href="contact-ai.html" class="btn btn-primary btn-sm">Hire Talent →</a>
-    <button class="burger" id="burger" style="display:none"><span></span><span></span><span></span></button>
+    <button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
   </div>
 </nav>
 <div class="mobile-drawer" id="drawer">
@@ -243,7 +243,7 @@ textarea.fi { resize: vertical; min-height: 100px; }
         <div class="err-box" id="errBox"></div>
 
         <!-- Form (Netlify Forms integrated) -->
-        <form id="contactForm" name="contact" method="POST" action="/contact-ai.html" data-netlify="true" netlify-honeypot="bot-field" novalidate>
+        <form id="contactForm" name="contact" method="POST" action="/thank-you.html" data-netlify="true" netlify-honeypot="bot-field" novalidate>
           <!-- Netlify required hidden fields -->
           <input type="hidden" name="form-name" value="contact"/>
           <p style="display:none">
@@ -307,8 +307,8 @@ const nav = document.getElementById('navbar');
 window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 20), {passive:true});
 const burger = document.getElementById('burger'), drawer = document.getElementById('drawer');
 if (burger && drawer) {
-  burger.style.display = '';
-  burger.addEventListener('click', () => {
+  burger.addEventListener('click', (e) => {
+    e.stopPropagation();
     const isOpen = drawer.classList.toggle('open');
     burger.classList.toggle('open', isOpen);
   });
@@ -316,6 +316,12 @@ if (burger && drawer) {
     drawer.classList.remove('open');
     burger.classList.remove('open');
   }));
+  document.addEventListener('click', (e) => {
+    if (drawer.classList.contains('open') && !drawer.contains(e.target) && !burger.contains(e.target)) {
+      drawer.classList.remove('open');
+      burger.classList.remove('open');
+    }
+  });
 }
 
 /* ── Type toggle ── */

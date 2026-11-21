@@ -233,8 +233,9 @@
 .hm-card h3 { font-size:1rem;font-weight:700;color:var(--gray-900);margin-bottom:8px; }
 .hm-card p { color:var(--gray-600);font-size:.875rem;line-height:1.7; }
 
-@media(max-width:900px) {
-  .nav-center{display:none}.burger{display:flex!important}
+@media(max-width:992px) {
+  .nav-center, .nav-right .btn, .nav-ai-badge { display:none !important; }
+  .burger { display:flex !important; }
   .acc-jobs-grid{grid-template-columns:1fr}
   .hm-grid{grid-template-columns:1fr}
   .acc-header{padding:18px 20px;gap:14px}
@@ -282,7 +283,7 @@
   <div class="nav-right">
     <div class="nav-ai-badge"><span class="nav-ai-dot"></span> AI-Powered</div>
     <a href="contact-ai.html" class="btn btn-primary btn-sm">Hire Talent →</a>
-    <button class="burger" id="burger" style="display:none"><span></span><span></span><span></span></button>
+    <button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
   </div>
 </nav>
 <div class="mobile-drawer" id="drawer">
@@ -919,8 +920,8 @@ const nav = document.getElementById('navbar');
 window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 20), {passive:true});
 const burger = document.getElementById('burger'), drawer = document.getElementById('drawer');
 if (burger && drawer) {
-  burger.style.display = '';
-  burger.addEventListener('click', () => {
+  burger.addEventListener('click', (e) => {
+    e.stopPropagation();
     const isOpen = drawer.classList.toggle('open');
     burger.classList.toggle('open', isOpen);
   });
@@ -928,6 +929,12 @@ if (burger && drawer) {
     drawer.classList.remove('open');
     burger.classList.remove('open');
   }));
+  document.addEventListener('click', (e) => {
+    if (drawer.classList.contains('open') && !drawer.contains(e.target) && !burger.contains(e.target)) {
+      drawer.classList.remove('open');
+      burger.classList.remove('open');
+    }
+  });
 }
 
 /* ── Accordion ── */
