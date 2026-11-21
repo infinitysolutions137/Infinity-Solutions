@@ -224,19 +224,56 @@
   border-radius: 100px; padding: 3px 10px; font-size: .7rem; font-weight: 700;
 }
 
+.testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 48px; }
+
 @media (max-width: 1024px) {
-  .hero-content { grid-template-columns: 1fr; }
+  .hero-content { grid-template-columns: 1fr; gap: 40px; }
   .hero-right { display: none; }
   .features-grid { grid-template-columns: 1fr 1fr; }
   .sectors-grid { grid-template-columns: 1fr 1fr; }
   .split-section { grid-template-columns: 1fr; }
+  .split-card { min-height: 400px; }
+  .testimonials-grid { grid-template-columns: 1fr 1fr; }
   .stats-grid { grid-template-columns: 1fr 1fr; }
   .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
   .stat-item:nth-child(2n) { border-right: none; }
 }
+
 @media (max-width: 768px) {
-  .features-grid, .sectors-grid { grid-template-columns: 1fr; }
-  .hero h1 { font-size: 2.4rem; }
+  .hero { padding: 48px 0 56px; min-height: auto; }
+  .hero h1 { font-size: clamp(2.1rem, 7vw, 2.9rem); }
+  .hero-sub { font-size: .95rem; line-height: 1.7; margin-bottom: 28px; }
+  .features-grid, .sectors-grid, .testimonials-grid { grid-template-columns: 1fr; }
+  .split-card { min-height: 340px; }
+  .split-content { padding: 28px 20px; }
+  .split-content h2 { font-size: 1.5rem; }
+  .cta-section { padding: 64px 0; }
+}
+
+@media (max-width: 640px) {
+  .hero-actions { flex-direction: column; width: 100%; }
+  .hero-actions .btn { width: 100%; justify-content: center; }
+  .cta-actions { flex-direction: column; width: 100%; }
+  .cta-actions .btn { width: 100%; justify-content: center; }
+
+  /* Hero search row stack */
+  .hs-row { flex-direction: column; gap: 10px; }
+  .hs-select { min-width: 100%; width: 100%; }
+  .hs-submit { width: 100%; justify-content: center; padding: 14px; }
+  .hero-search { border-radius: 12px; }
+
+  /* Stats grid */
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .stat-item { padding: 14px 8px; }
+  .stat-num { font-size: 1.9rem; }
+  .stat-label { font-size: .75rem; }
+}
+
+@media (max-width: 440px) {
+  .stats-grid { grid-template-columns: 1fr; }
+  .stat-item:last-child { border-bottom: none; }
+  .hero-announce { width: 100%; box-sizing: border-box; }
+  .ha-text { font-size: .75rem; }
 }
 </style>
 </head>
@@ -266,9 +303,12 @@
   </div>
 </nav>
 <div class="mobile-drawer" id="drawer">
-  <a href="index.html">Home</a><a href="jobs.html">Jobs</a>
-  <a href="services-ai.html">Services</a><a href="jobs.html">Careers</a><a href="about-ai.html">About</a>
+  <a href="index.html">Home</a>
+  <a href="jobs.html">Jobs</a>
+  <a href="services-ai.html">Services</a>
+  <a href="about-ai.html">About</a>
   <a href="contact-ai.html">Contact</a>
+  <a href="contact-ai.html" class="btn btn-primary drawer-cta" style="margin-top:16px;color:#fff;justify-content:center">Hire Talent →</a>
 </div>
 
 <!-- ═══ HERO ═════════════════════════════════════════════════════════════ -->
@@ -526,7 +566,7 @@
   <div class="container">
     <div class="eyebrow">Client Stories</div>
     <h2 class="display-md">Results that speak<br/>for themselves</h2>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px">
+    <div class="testimonials-grid">
       <div class="tcard" data-animate>
         <div class="tcard-stars">★★★★★</div>
         <p>"The AI match score was spot-on. All three engineers placed were still with us a year later — cultural fit was exceptional. Infinity's platform is unlike anything we've used."</p>
@@ -631,8 +671,18 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 20), {passive:true});
   // Burger
   const burger = document.getElementById('burger'), drawer = document.getElementById('drawer');
-  burger.addEventListener('click', () => drawer.classList.toggle('open'));
-  drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => drawer.classList.remove('open')));
+  if (burger && drawer) {
+    burger.addEventListener('click', () => {
+      const isOpen = drawer.classList.toggle('open');
+      burger.classList.toggle('open', isOpen);
+      burger.setAttribute('aria-expanded', isOpen);
+    });
+    drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      drawer.classList.remove('open');
+      burger.classList.remove('open');
+      burger.setAttribute('aria-expanded', 'false');
+    }));
+  }
   // Tabs
   document.querySelectorAll('.stab').forEach(t => t.addEventListener('click', () => {
     document.querySelectorAll('.stab').forEach(x => x.classList.remove('active'));

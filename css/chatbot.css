@@ -121,7 +121,23 @@
 /* Powered by */
 .chat-powered { text-align: center; padding: 6px; font-size: .65rem; color: #94A3B8; background: #fff; border-top: 1px solid #F1F5F9; }
 
-@media (max-width: 440px) {
-  .chat-window { width: calc(100vw - 32px); right: 16px; height: 70vh; }
-  .chat-launcher { right: 16px; bottom: 16px; }
+@media (max-width: 480px) {
+  .chat-window {
+    width: calc(100vw - 32px);
+    right: 16px;
+    bottom: 80px;
+    height: calc(100vh - 110px);
+    max-height: 540px;
+    border-radius: 16px;
+  }
+  .chat-launcher {
+    right: 16px;
+    bottom: 16px;
+    width: 52px;
+    height: 52px;
+  }
+  .msg-bubble {
+    max-width: 86%;
+    font-size: .83rem;
+  }
 }
