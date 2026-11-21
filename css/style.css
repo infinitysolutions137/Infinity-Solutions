@@ -214,6 +214,7 @@ button { font-family: var(--font-sans); cursor: pointer; }
   background: var(--gray-900);
   border-radius: 2px;
   transition: transform .25s ease, opacity .2s ease;
+  pointer-events: none;
 }
 .mobile-drawer {
   display: none; position: fixed; top: var(--nav-h); left: 0; right: 0; z-index: 299;

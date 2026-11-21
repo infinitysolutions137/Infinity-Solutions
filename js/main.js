@@ -18,13 +18,19 @@ export function initNavbar() {
 export function initMobileMenu() {
   const burger = document.getElementById('burger');
   const drawer = document.getElementById('drawer');
-  if (!burger || !drawer) return;
+  if (!burger || !drawer || burger.dataset.bound) return;
+  burger.dataset.bound = 'true';
   burger.addEventListener('click', () => {
     const open = drawer.classList.toggle('open');
+    burger.classList.toggle('open', open);
     burger.setAttribute('aria-expanded', open);
   });
   drawer.querySelectorAll('a').forEach(a =>
-    a.addEventListener('click', () => drawer.classList.remove('open'))
+    a.addEventListener('click', () => {
+      drawer.classList.remove('open');
+      burger.classList.remove('open');
+      burger.setAttribute('aria-expanded', 'false');
+    })
   );
 }
 
