@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="css/style.css"/>
 <link rel="stylesheet" href="css/chatbot.css"/>
+<link rel="icon" type="image/png" href="images/logo-icon.png"/>
 <style>
 .about-hero{margin-top:var(--nav-h);display:grid;grid-template-columns:1fr 1fr;min-height:540px}
 .ah-left{background:var(--gray-900);padding:80px 64px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
@@ -53,7 +54,7 @@
 </head>
 <body>
 <nav class="navbar" id="navbar">
-  <a href="index.html" class="nav-logo"><div class="nav-logo-mark">IS</div> Infinity Solutions</a>
+  <a href="index.html" class="nav-logo" aria-label="Infinity Solutions Home"><img src="images/logo-dark.png" alt="Infinity Solutions" class="nav-logo-img"/></a>
   <div class="nav-center"><ul class="nav-links"><li><a href="index.html">Home</a></li><li><a href="jobs.html">Jobs</a></li><li><a href="services-ai.html">Services</a></li><li><a href="about-ai.html" class="active">About</a></li><li><a href="contact-ai.html">Contact</a></li></ul></div>
   <div class="nav-right"><div class="nav-ai-badge"><span class="nav-ai-dot"></span> AI-Powered</div><a href="contact-ai.html" class="btn btn-primary btn-sm">Hire Talent →</a><button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button></div>
 </nav>
@@ -134,7 +135,7 @@
   </div>
 </div>
 
-<footer class="footer"><div class="container"><div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,.08);padding-top:24px;flex-wrap:wrap;gap:12px"><div class="nav-logo" style="color:#fff"><div class="nav-logo-mark">IS</div> Infinity Solutions</div><p style="color:var(--gray-500);font-size:.8rem">© 2025 Infinity Solutions Inc.</p><div style="display:flex;gap:20px"><a href="index.html" style="color:var(--gray-500);font-size:.8rem">Home</a><a href="contact-ai.html" style="color:var(--gray-500);font-size:.8rem">Contact</a></div></div></div></footer>
+<footer class="footer"><div class="container"><div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,.08);padding-top:24px;flex-wrap:wrap;gap:12px"><a href="index.html" class="nav-logo" aria-label="Infinity Solutions Home"><img src="images/logo.png" alt="Infinity Solutions" class="nav-logo-img nav-logo-footer"/></a><p style="color:var(--gray-500);font-size:.8rem">© 2025 Infinity Solutions Inc.</p><div style="display:flex;gap:20px"><a href="index.html" style="color:var(--gray-500);font-size:.8rem">Home</a><a href="contact-ai.html" style="color:var(--gray-500);font-size:.8rem">Contact</a></div></div></div></footer>
 <script>
 const nav=document.getElementById('navbar');
 window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>20),{passive:true});
